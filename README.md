@@ -30,11 +30,12 @@ This GitLab repository should be the only used for the project.
 - */app_quiz/* - App for the quizzing system
 - */app_tools/* - App for the finance tools
 - */app_user/* - App for user management
+- */locale/* - Folder for string localisation
 - */templates/* - Folder to contain all site-wide HTML templates, e.g. header
 - */static/* - Folder to contain all site-wide static content, e.g. avatars, JavaScript, CSS, etc.
 - */com2027.yml* - YAML file used to configure the static site
 
-*sub-apps may also contain a templates or media folder if they require one*
+*sub-apps may also contain a templates or static folder if they require one*
 
 
 ## Branching Instructions
