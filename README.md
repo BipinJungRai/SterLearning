@@ -14,7 +14,7 @@ The final commit on `release` will be marked. It is up to the technical lead to 
 
 ## Technologies Used
 
-For our back-end, we will be using [Django](https://www.djangoproject.com/). The database used with Django is PostgreSQL.
+For our back-end, we will be using [Django](https://www.djangoproject.com/). The database used with Django is SQLite.
 
 The front-end framework is [Bootstrap](https://getbootstrap.com/), including [Bootstrap icons](https://icons.getbootstrap.com/).
 
@@ -24,8 +24,17 @@ This GitLab repository should be the only used for the project.
 ## Project Structure
 
 - */SterLearning/* - Django project configuration
-- *TBD*
+- */app_admin/* - App for custom admin system
+- */app_leaderboard/* - App for real-time leaderboard system
+- */app_pages/* - App to contain all generic web pages
+- */app_quiz/* - App for the quizzing system
+- */app_tools/* - App for the finance tools
+- */app_user/* - App for user management
+- */templates/* - Folder to contain all site-wide HTML templates, e.g. header
+- */static/* - Folder to contain all site-wide static content, e.g. avatars, JavaScript, CSS, etc.
 - */com2027.yml* - YAML file used to configure the static site
+
+*sub-apps may also contain a templates or media folder if they require one*
 
 
 ## Branching Instructions
