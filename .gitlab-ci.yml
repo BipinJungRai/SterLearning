@@ -8,7 +8,7 @@ merging:
 django-tests:
   stage: test
   before_script:
-    - pip install -r requirements.txt
+    - pip3 install -r requirements.txt
   script:
     - python3 manage.py test
 
