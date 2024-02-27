@@ -5,6 +5,13 @@ merging:
      - "[[ \"$CI_MERGE_REQUEST_TARGET_BRANCH_NAME\" =~ ^release$ ]] && [[ ! \"$CI_MERGE_REQUEST_SOURCE_BRANCH_NAME\" =~ ^trunk$ ]] && echo 'Only trunk can be merged to release' && exit 1"
      - exit 0
 
+django-tests:
+  stage: test
+  before_script:
+    - pip install -r requirements.txt
+  script:
+    - python3 manage.py test
+
 pages:
   stage: deploy
   script:
