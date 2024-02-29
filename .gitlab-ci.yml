@@ -16,7 +16,6 @@ django-tests:
 
 pylint:
   stage: linting
-  allow_failure: true
   before_script:
     - python3 -m pip install -r requirements.txt
     - python3 -m pip install pylint
