@@ -282,3 +282,8 @@ ol, ul {
         display: none;
     }
 }
+
+.footer-style {
+    background-color: transparent;
+    color: black;
+}
