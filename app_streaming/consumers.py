@@ -116,7 +116,7 @@ class QuizConsumer(WebsocketConsumer):
                     blank = sentence["blank"]
                     
                     s = get_object_or_404(FillInBlankSentence, id = sid)
-                    if blank == s.blank:
+                    if blank.lower() == s.blank.lower():
                         total += s.points
                         correct.append(sid)
                 

@@ -1,6 +1,29 @@
 from django.db import models
+from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
 
+
+# Verifies that no two sections share the same positions
+def check_unique_pos(self):
+    quiz = self.quiz
+    pos = self.position
+
+    mcq = MultipleChoice.objects.filter(quiz = quiz, position = pos)
+    fib = FillInBlank.objects.filter(quiz = quiz, position = pos)
+    inf = Information.objects.filter(quiz = quiz, position = pos)
+
+    if mcq.count() != 0:
+        if self.__class__ != MultipleChoice or mcq.count() != 1:
+            raise ValidationError(gettext("SectionAlreadyAtPosition"))
+    
+    if fib.count() != 0:
+        if self.__class__ != FillInBlank or fib.count() != 1:
+            raise ValidationError(gettext("SectionAlreadyAtPosition"))
+    
+    if inf.count() != 0:
+        if self.__class__ != Information or inf.count() != 1:
+            raise ValidationError(gettext("SectionAlreadyAtPosition"))
+    
 
 # Quiz model - stores which pathway the quiz is in and its name.
 class Quiz(models.Model):
@@ -11,9 +34,9 @@ class Quiz(models.Model):
         TAX = "TAX", gettext("TaxesPathway")
         PENSION = "PENSION", gettext("PensionsPathway")
 
-    name = models.CharField(max_length = 250)
+    name = models.CharField(max_length = 100)
     description = models.TextField()
-    pathway = models.CharField(choices = Pathways.choices, max_length = 100)
+    pathway = models.CharField(choices = Pathways.choices, max_length = 7)
 
 
 # Abstract class for a section within a quiz containing a title and position.
@@ -30,6 +53,9 @@ class QuizSection(models.Model):
 class MultipleChoice(QuizSection):
     points = models.IntegerField()
 
+    def clean(self):
+        check_unique_pos(self)
+
 
 # Option for a MCQ. Relates to one MultipleChoice instance.
 class MultipleChoiceOptions(models.Model):
@@ -37,21 +63,53 @@ class MultipleChoiceOptions(models.Model):
     correct = models.BooleanField()
     question = models.ForeignKey(MultipleChoice, on_delete = models.CASCADE)
 
+    def clean(self):
+        question = self.question
+        correct = 0
+
+        for option in MultipleChoiceOptions.objects.filter(question = question):
+            if option.correct:
+                correct += 1
+
+        if correct > 1:
+            raise ValidationError("TooManyCorrectAnswers")
+
 # Model for fill in the blank questions. No additional fields needed.
 class FillInBlank(QuizSection):
-    pass
+    def clean(self):
+        check_unique_pos(self)
 
 
 # A setence within a fill in the blank question. Blank can be at the start or
 # end and is optional. Related to one FillInBlank.
 class FillInBlankSentence(models.Model):
-    before = models.CharField(null = True, max_length = 100)
-    blank = models.CharField(null = True, max_length = 100)
-    after = models.CharField(null = True, max_length = 100)
+    before = models.CharField(null = True, blank = True, max_length = 100)
+    blank = models.CharField(null = True, blank = True, max_length = 100)
+    after = models.CharField(null = True, blank = True, max_length = 100)
     question = models.ForeignKey(FillInBlank, on_delete = models.CASCADE)
     points = models.IntegerField()
+
+    def clean(self):
+        before = True
+        blank = True
+        after = True
+
+        if self.before == None or self.before == "":
+            before = False
+        
+        if self.blank == None or self.blank == "":
+            blank = False
+
+        if self.after == None or self.after == "":
+            after = False
+
+        if before == False and blank == False and after == False:
+            raise ValidationError("SentenceEmpty")
 
 
 # Model for an information screen that can be put in a quiz to give user info.
 class Information(QuizSection):
     content = models.TextField()
+
+    def clean(self):
+        check_unique_pos(self)
