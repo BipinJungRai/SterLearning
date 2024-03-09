@@ -12,12 +12,13 @@ class Quiz(models.Model):
         PENSION = "PENSION", gettext("PensionsPathway")
 
     name = models.CharField(max_length = 250)
-    pathway = models.CharField(choices = Pathways.choices)
+    description = models.TextField()
+    pathway = models.CharField(choices = Pathways.choices, max_length = 100)
 
 
 # Abstract class for a section within a quiz containing a title and position.
 class QuizSection(models.Model):
-    title = models.CharField()
+    title = models.CharField(max_length = 100)
     quiz = models.ForeignKey(Quiz, on_delete = models.CASCADE)
     position = models.IntegerField()
 
@@ -32,7 +33,7 @@ class MultipleChoice(QuizSection):
 
 # Option for a MCQ. Relates to one MultipleChoice instance.
 class MultipleChoiceOptions(models.Model):
-    text = models.CharField()
+    text = models.CharField(max_length = 100)
     correct = models.BooleanField()
     question = models.ForeignKey(MultipleChoice, on_delete = models.CASCADE)
 
@@ -44,9 +45,9 @@ class FillInBlank(QuizSection):
 # A setence within a fill in the blank question. Blank can be at the start or
 # end and is optional. Related to one FillInBlank.
 class FillInBlankSentence(models.Model):
-    before = models.CharField(null = True)
-    blank = models.CharField(null = True)
-    after = models.CharField(null = True)
+    before = models.CharField(null = True, max_length = 100)
+    blank = models.CharField(null = True, max_length = 100)
+    after = models.CharField(null = True, max_length = 100)
     question = models.ForeignKey(FillInBlank, on_delete = models.CASCADE)
     points = models.IntegerField()
 
