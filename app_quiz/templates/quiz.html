@@ -1,0 +1,42 @@
+{% load i18n %}
+
+<script>
+    //// DEMONSTRATION ONLY // NOT FINAL ////
+    // ignore the if statements, they are just here to make sure it is in order
+    let url = `ws://${window.location.host}/ws/quiz-stream`
+    const quizSocket = new WebSocket(url)
+
+    quizSocket.onmessage = function(message){ // Receive message example
+        let data = JSON.parse(message.data)
+        console.log('Data:', data)
+
+        // example for starting quiz
+        if(data.type === 'connected') {
+            quizSocket.send(JSON.stringify({
+                'type':'start',
+                'qid': {{ quiz.id }}
+            }))
+        }
+
+        // example for moving to next section after info panel
+        if(data.type === 'first_section') {
+            quizSocket.send(JSON.stringify({
+                'type':'next',
+                'qid': {{ quiz.id }},
+                'position': data.section.position
+            }))
+        }
+
+        // example for validating a multiple choice question
+        if(data.type === 'next_section') {
+            quizSocket.send(JSON.stringify({
+                'type':'answer',
+                'section_type': 'mcq',
+                'question_id': data.section.sid,
+                'selected_id': 1
+            }))
+        }
+    }
+
+    
+</script>
