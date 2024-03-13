@@ -15,8 +15,22 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
+from app_quiz import views as quiz_views
+
+# These are the URL patterns specific to the 5 pathways.
+# learn/ is stripped from the start of the URL in the main pattern.
+pathway_patterns =[
+    path("", quiz_views.pathways),
+    path("bank-accounts/", quiz_views.bank),
+    path("pensions/", quiz_views.pensions),
+    path("taxes/", quiz_views.taxes),
+    path("loans/", quiz_views.loans),
+    path("budgeting/", quiz_views.budget),
+]
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    path("admin/", admin.site.urls),
+    path("learn/", include(pathway_patterns)),
+    path("quiz/<int:qid>/", quiz_views.quiz),
 ]
