@@ -32,5 +32,5 @@ pathway_patterns =[
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("learn/", include(pathway_patterns)),
-    path("quiz/<int:qid>/", quiz_views.quiz),
+    path("quiz/<int:qid>/", quiz_views.quiz, name="quiz-views-quiz"),
 ]
