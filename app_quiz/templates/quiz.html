@@ -1,42 +1,83 @@
 {% load i18n %}
+{% load static %}
+<head>
+
+</head>
+
+<body>
+    current state: 
+    <p id="progress">
+        connecting...
+    </p>
+
+    <form id="quizform">
+            <div id="quizcontents">
+            </div>
+            <input id="nextbutton" type="submit" value="Start quiz">
+    </form>
+
+</body>
 
 <script>
-    //// DEMONSTRATION ONLY // NOT FINAL ////
-    // ignore the if statements, they are just here to make sure it is in order
     let url = `ws://${window.location.host}/ws/quiz-stream`
-    const quizSocket = new WebSocket(url)
+        const quizSocket = new WebSocket(url)
 
-    quizSocket.onmessage = function(message){ // Receive message example
-        let data = JSON.parse(message.data)
-        console.log('Data:', data)
+        // function for submit button
+        window.addEventListener("DOMContentLoaded", (event) => { //do after page loads
+            const form = document.querySelector('form');
+            function handleForm(event) {
+                event.preventDefault(); //page does not refresh on submit
+                console.log("submitted");
+            }
+            form.addEventListener('submit', handleForm, true);
+        });
 
-        // example for starting quiz
-        if(data.type === 'connected') {
-            quizSocket.send(JSON.stringify({
-                'type':'start',
-                'qid': {{ quiz.id }}
-            }))
+        quizSocket.onmessage = function (message) {
+            // const fform = document.getElementById("quizform");
+            // fform.removeEventListener('submit', handleForm, true);
+
+            let data = JSON.parse(message.data);
+            console.log('Data: ', data);
+
+            const progress = document.getElementById("progress");
+            const form = document.getElementById("quizform");
+
+            if (data.type == 'connected') {
+                progress.innerHTML = "connected"
+                var handleForm = function(event) {
+                    quizSocket.send(JSON.stringify({
+                        'type': 'start',
+                        'qid': {{quiz.id}}
+                    }));
+                }
+                const form = document.querySelector('form');
+                form.addEventListener('submit', handleForm, {once: true});
+            };
+
+            if(data.type === 'first_section') {
+                console.log("data sect pos: " + data.section.position);
+                var handleForm = function(event) {
+                    quizSocket.send(JSON.stringify({
+                        'type':'next',
+                        'qid': {{ quiz.id }},
+                        'position': data.section.position
+                    }))
+                }
+                const form = document.querySelector('form');
+                form.addEventListener('submit', handleForm, {once: true});
+            }
+
+            if(data.type === 'next_section') {
+                var handleForm = function(event) {
+                    quizSocket.send(JSON.stringify({
+                        'type':'answer',
+                        'section_type': 'mcq',
+                        'question_id': data.section.sid,
+                        'selected_id': 1
+                    }))
+                }
+                const form = document.querySelector('form');
+                form.addEventListener('submit', handleForm, {once: true});
+            }
         }
-
-        // example for moving to next section after info panel
-        if(data.type === 'first_section') {
-            quizSocket.send(JSON.stringify({
-                'type':'next',
-                'qid': {{ quiz.id }},
-                'position': data.section.position
-            }))
-        }
-
-        // example for validating a multiple choice question
-        if(data.type === 'next_section') {
-            quizSocket.send(JSON.stringify({
-                'type':'answer',
-                'section_type': 'mcq',
-                'question_id': data.section.sid,
-                'selected_id': 1
-            }))
-        }
-    }
-
-    
 </script>
