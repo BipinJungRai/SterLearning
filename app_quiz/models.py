@@ -135,11 +135,11 @@ class MultipleChoiceResponse(models.Model):
 # Model to represent a user's answer to a FIB
 class FillInBlankReponse(models.Model):
     attempt = models.ForeignKey(Attempt, on_delete = models.CASCADE)
-    points_awarded = models.IntegerField()
 
 
 # Model to link a user's FIB answer to the corresponding sentence
 class FillInBlankAnswer(models.Model):
     response = models.ForeignKey(FillInBlankReponse, on_delete = models.CASCADE)
     blank = models.CharField(null = True, blank = True, max_length = 100)
+    points_awarded = models.IntegerField()
     sentence = models.ForeignKey(FillInBlankSentence, on_delete = models.CASCADE)
