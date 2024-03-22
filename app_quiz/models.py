@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
+from app_user.models import User
 
 
 # Verifies that no two sections share the same positions
@@ -110,6 +111,35 @@ class FillInBlankSentence(models.Model):
 # Model for an information screen that can be put in a quiz to give user info.
 class Information(QuizSection):
     content = models.TextField()
+    image = models.ImageField(null = True, blank = True, upload_to = 'images/quizzes/info_sections')
 
     def clean(self):
         check_unique_pos(self)
+
+
+# Model for a user's attempt at a quiz
+class Attempt(models.Model):
+    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    quiz = models.ForeignKey(Quiz, on_delete = models.CASCADE)
+    completed = models.BooleanField(default = False)
+    quiz_open = models.BooleanField(default = True)
+
+
+# Model to represent a user's answer to a MCQ
+class MultipleChoiceResponse(models.Model):
+    attempt = models.ForeignKey(Attempt, on_delete = models.CASCADE)
+    answer = models.ForeignKey(MultipleChoiceOptions, on_delete = models.CASCADE)
+    points_awarded = models.IntegerField()
+
+
+# Model to represent a user's answer to a FIB
+class FillInBlankReponse(models.Model):
+    attempt = models.ForeignKey(Attempt, on_delete = models.CASCADE)
+    points_awarded = models.IntegerField()
+
+
+# Model to link a user's FIB answer to the corresponding sentence
+class FillInBlankAnswer(models.Model):
+    response = models.ForeignKey(FillInBlankReponse, on_delete = models.CASCADE)
+    blank = models.CharField(null = True, blank = True, max_length = 100)
+    sentence = models.ForeignKey(FillInBlankSentence, on_delete = models.CASCADE)
