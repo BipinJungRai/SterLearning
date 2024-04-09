@@ -185,9 +185,9 @@ class QuizConsumer(WebsocketConsumer):
             qid = data["qid"]
             quiz = get_object_or_404(Quiz, id = qid)
             result = get_section(quiz, 1)
-            tempuser,created = User.objects.get_or_create(username = "test") # can be removed once middleware done
+            #tempuser,created = ExtendedUser.objects.get_or_create(username = "test") # can be removed once middleware done
 
-            attempt = Attempt(user = tempuser, # should be self.user once middleware done
+            attempt = Attempt(user = self.user, # should be self.user once middleware done
                               quiz = quiz,
                               completed = False,
                               quiz_open = True)

@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
-from app_user.models import User
+from app_user.models import ExtendedUser
 
 
 # Verifies that no two sections share the same positions
@@ -119,7 +119,7 @@ class Information(QuizSection):
 
 # Model for a user's attempt at a quiz
 class Attempt(models.Model):
-    user = models.ForeignKey(User, on_delete = models.CASCADE)
+    user = models.ForeignKey(ExtendedUser, on_delete = models.CASCADE)
     quiz = models.ForeignKey(Quiz, on_delete = models.CASCADE)
     completed = models.BooleanField(default = False)
     quiz_open = models.BooleanField(default = True)
