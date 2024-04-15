@@ -11,16 +11,23 @@ import os
 
 from django.core.asgi import get_asgi_application
 from channels.routing import ProtocolTypeRouter, URLRouter
-from channels.auth import AuthMiddlewareStack
+from channels.auth import AuthMiddlewareStack, SessionMiddleware, CookieMiddleware
 import app_streaming.routing
+from app_streaming.middleware import QueryAuthMiddleware
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'SterLearning.settings')
 
 application = ProtocolTypeRouter({
     'http':get_asgi_application(),
-    'websocket':AuthMiddlewareStack(
-        URLRouter(
-            app_streaming.routing.ws_urlpatterns
+    'websocket':
+        CookieMiddleware(
+            SessionMiddleware(
+                QueryAuthMiddleware(
+                    URLRouter(
+                        app_streaming.routing.ws_urlpatterns
+                    )
+                )
+            )
         )
-    )
+    
 })

@@ -1,5 +1,5 @@
 from django.test import TestCase
-from .models import User, Decoration, Avatar
+from .models import ExtendedUser, Decoration, Avatar
 from pathlib import Path
 from django.core.files.images import ImageFile
 
@@ -44,10 +44,10 @@ def test_save_avatar(self):
         avatar.full_clean()
         self.assertEqual(db_count+1, Avatar.objects.all().count())
 
-class UserTests(TestCase):
+class ExtendedUserTests(TestCase):
     @classmethod
     def setUpTestData(cls):
-        u1 = User(username='TestUser1',
+        u1 = ExtendedUser(username='TestExtendedUser1',
                   password='TestPassword1',
                   email='testuser1@test.com')
         u1.save()
@@ -60,7 +60,7 @@ class UserTests(TestCase):
                                         name=image_path))
         a1.save()
         a1.full_clean()
-        user = User(username='NewUser',
+        user = ExtendedUser(username='NewExtendedUser',
                     password='NewPassword',
                     email='newuser@test.com',
                     avatar=a1)
@@ -77,7 +77,7 @@ class UserTests(TestCase):
                                         name=image_path))
         d1.save()
         d1.full_clean()
-        user = User(username='NewUser',
+        user = ExtendedUser(username='NewExtendedUser',
                     password='NewPassword',
                     email='newuser@test.com',
                     decoration=d1)
