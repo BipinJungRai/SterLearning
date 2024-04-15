@@ -1,0 +1,54 @@
+div.wholecircle {
+    width: 80vh;
+    position: fixed;
+    top: 10vh;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+}
+
+img.circle {
+    width: 80vh;
+    position: fixed;
+    left: 25vw - width;
+    opacity: 0.3;
+    transition: transform .2s;
+    transform-origin: center;
+    pointer-events: none;
+}
+
+.segment {
+    position: fixed;
+    width: 280px;
+    height: 280px;
+    /* width: 0; 
+    height: 0; 
+    border: 295px solid black;
+    transform: rotate(90deg); */
+    transition: all .2s;
+}
+
+.segment.red {
+    transform: translate(0px, 0px);
+}
+.segment.green {
+    transform: translate(280px, 0px);
+}
+.segment.blue {
+    transform: translate(140px, 280px);
+}
+
+.green > .circle {
+    /* transform: translate(-280px, 0); */
+    left: -280px;
+}
+
+.blue > .circle {
+    left: -140px;
+    top: -280px;
+}
+
+.segment:hover > .circle{
+    transition: all .2s;
+    -webkit-transform: scale(1.1);
+    opacity: 1;
+}

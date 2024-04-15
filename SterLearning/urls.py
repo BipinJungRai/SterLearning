@@ -21,7 +21,7 @@ from app_quiz import views as quiz_views
 # These are the URL patterns specific to the 5 pathways.
 # learn/ is stripped from the start of the URL in the main pattern.
 pathway_patterns =[
-    path("", quiz_views.pathways),
+    path("", quiz_views.pathways, name="pathways-home"),
     path("bank-accounts/", quiz_views.bank),
     path("pensions/", quiz_views.pensions),
     path("taxes/", quiz_views.taxes),
@@ -32,6 +32,6 @@ pathway_patterns =[
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("learn/", include(pathway_patterns)),
-    path("quiz/<int:qid>/", quiz_views.quiz),
+    path("quiz/<int:qid>/", quiz_views.quiz, name="quiz-views-quiz"),
     path("accounts/", include("app_user.urls")),
 ]
