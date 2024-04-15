@@ -20,7 +20,7 @@ class Avatar(models.Model):
     def __str__(self):
         return self.name
 
-class User(AbstractUser):
+class ExtendedUser(AbstractUser):
     
     avatar = models.ForeignKey(Avatar, null=True, blank=True, on_delete=models.SET_NULL, related_name='%(class)s_avatar_used') #User may not have an avatar to begin with, so can be null
     decoration = models.ForeignKey(Decoration, blank=True, null=True, on_delete=models.SET_NULL, related_name='%(class)s_decoration_used') #User may not have a decoration to begin with, so can be null

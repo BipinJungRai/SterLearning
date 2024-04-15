@@ -56,6 +56,11 @@ def get_section(quiz, pos):
         section["title"] = i.title
         section["position"] = pos
         section["content"] = i.content
+        section["image"] = "NO_IMAGE"
+
+        if i.image:
+            section["image"] = i.image.url
+        
         result["section_type"] = "inf"
 
     else:
@@ -90,8 +95,10 @@ class QuizConsumer(WebsocketConsumer):
 
                 question = get_object_or_404(MultipleChoice, id = qid)
                 selected = get_object_or_404(MultipleChoiceOptions, id = sid)
+                points = 0
 
                 if selected.correct:
+                    points = question.points
                     self.send(json.dumps(
                         {
                             "type": "validated_mcq_answer",
@@ -107,18 +114,33 @@ class QuizConsumer(WebsocketConsumer):
                             "awarded": 0
                         }
                     ))
+                
+                response = MultipleChoiceResponse(attempt = self.attempt,
+                                                  answer = selected,
+                                                  points_awarded = points)
+                response.save()
             elif data["section_type"] == "fib":
                 total = 0
                 correct = []
+                response = FillInBlankReponse(attempt = self.attempt)
+                response.save()
 
                 for sentence in data["sentences"]:
                     sid = sentence["id"]
                     blank = sentence["blank"]
+                    points = 0
                     
                     s = get_object_or_404(FillInBlankSentence, id = sid)
                     if blank.lower() == s.blank.lower():
                         total += s.points
+                        points = s.points
                         correct.append(sid)
+
+                    answer = FillInBlankAnswer(response = response,
+                                               blank = blank,
+                                               points_awarded = points,
+                                               sentence = s)
+                    answer.save()
                 
                 self.send(json.dumps(
                     {
@@ -142,6 +164,12 @@ class QuizConsumer(WebsocketConsumer):
                         "type": "end_quiz"
                     }
                 ))
+                attempt = self.attempt
+
+                attempt.completed = True
+                attempt.quiz_open = False
+                attempt.save()
+
                 self.close()
             else:
                 self.send(json.dumps(
@@ -157,6 +185,15 @@ class QuizConsumer(WebsocketConsumer):
             qid = data["qid"]
             quiz = get_object_or_404(Quiz, id = qid)
             result = get_section(quiz, 1)
+            #tempuser,created = ExtendedUser.objects.get_or_create(username = "test") # can be removed once middleware done
+
+            attempt = Attempt(user = self.user, # should be self.user once middleware done
+                              quiz = quiz,
+                              completed = False,
+                              quiz_open = True)
+            attempt.save()
+
+            self.attempt = attempt
 
             self.send(json.dumps(
                 {
