@@ -30,3 +30,19 @@ class ExtendedUser(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    def points(self):
+        points = PointsAwarded.objects.filter(user = self)
+        total = 0
+
+        for i in points:
+            total += i.points
+
+        return total
+    
+# Model to track when a user recieves points
+class PointsAwarded(models.Model):
+    user = models.ForeignKey(ExtendedUser, on_delete = models.CASCADE)
+    points = models.IntegerField()
+    time = models.DateTimeField(auto_now_add = True)
+
