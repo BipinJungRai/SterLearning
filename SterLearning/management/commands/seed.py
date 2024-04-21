@@ -2,7 +2,7 @@
 from django.core.management.base import BaseCommand
 from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information
 
-# Define a command class to seed the database
+# Command class to seed the database
 class Command(BaseCommand):
     help = 'Seed the database with sample quiz data'
 
