@@ -1,32 +1,58 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
     <title>Test Page</title>
     <script src="https://accounts.google.com/gsi/client" async></script>
+    <link rel="stylesheet" href="{% static 'login.css' %}">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <body>
     {% if user.is_authenticated %}
     <li> <a href="">{{user.username}}</a> </li>
     <li> <a href="{% url 'logout' %}">Logout</a> </li>
     {% else %}
-    <li> <a href="{% url 'login' %}">Login</a> </li>
-    <li> <a href="{% url 'signup-user' %}">Signup</a> </li>
-    <div id="g_id_onload"
-        data-client_id="385254237271-qsm2re5si8iskcuqlu14b1rr09jd5oha.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="redirect"
-        data-login_uri="http://localhost:8000/accounts/auth-receiver"
-        data-itp_support="true">
-    </div>
+    <div class="wrapper">
+        <form action="">
+            <h1>Login</h1>
+            <div class="input-box">
+                <input type="text" placeholder="Username" required>
+                <i class='bx bxs-user'></i>
+            </div>
+            <div class="input-box">
+                <input type="password" placeholder="Password" required>
+                <i class='bx bxs-lock-alt'></i>
+            </div>
 
-    <div class="g_id_signin"
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="outline"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left">
+            <div class="remember-forgot">
+                <label><input type="checkbox"> Remember me</label>
+                <a href="#">Forgot password</a>
+            </div>
+
+            <button type="submit" class="btn">Login</button>
+
+            <div class="register-link">
+                <p>Don't have an account? <a href="{% url 'signup-user' %}">Signup</a></p>
+            </div>
+        </form>
+
+        <div id="g_id_onload"
+            data-client_id="385254237271-qsm2re5si8iskcuqlu14b1rr09jd5oha.apps.googleusercontent.com"
+            data-context="signin"
+            data-ux_mode="redirect"
+            data-login_uri="http://localhost:8000/accounts/auth-receiver"
+            data-itp_support="true">
+        </div>
+
+        <div class="g_id_signin"
+            data-type="standard"
+            data-shape="rectangular"
+            data-theme="outline"
+            data-text="signin_with"
+            data-size="large"
+            data-logo_alignment="left">
+        </div>
     </div>
-    {% endif%}
+    {% endif %}
 </body>
 </html>
