@@ -1,10 +1,9 @@
 
 .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
+    float: left;
+    min-height: 100vh;
     height: 100%;
-    width: 90px;
+    width: 78px;
     background: #11101D;
     padding: 6px 14px;
     z-index: 99;
@@ -29,7 +28,7 @@
 
 .sidebar .logo-details .logo_name {
     color: #fff;
-    font-size: 20px;
+    font-size: 26px;
     font-weight: 600;
     opacity: 0;
     transition: all 0.5s ease;
@@ -72,7 +71,7 @@
 }
 
 ol, ul {
-    padding-left: 1rem;
+    padding-left: 0.1rem;
 }
 
 
@@ -167,7 +166,7 @@ ol, ul {
 
 .sidebar li a .links_name {
     color: #fff;
-    font-size: 15px;
+    font-size: 24px;
     font-weight: 400;
     white-space: nowrap;
     opacity: 0;
@@ -191,6 +190,9 @@ ol, ul {
     line-height: 50px;
     font-size: 18px;
     border-radius: 12px;
+}
+.sidebar .myIcon{
+    font-size: 25px
 }
 
 .sidebar li.profile {
@@ -283,8 +285,4 @@ ol, ul {
     }
 }
 
-.footer-style {
-    background-color: transparent;
-    color: black;
-}
-/*commit*/
+/* TODO: Possibly need to make header responsive for some untested sizes */

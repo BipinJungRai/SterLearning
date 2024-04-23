@@ -1,55 +1,49 @@
 {% load static %}
 {% load i18n %}
-<html lang="en" dir="ltr">
-<head>
-    <meta charset="UTF-8">
-    <title> Sidebar Menu</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body>
-<div class="sidebar">
+
+<div class="sidebar" id="sidebar">
     <div class="logo-details">
         {#        <i class='bx bxl-c-plus-plus icon'></i>   I cant to make it into the graduation icon instead#}
         <div class="logo_name">SterLearning</div>
-        <i class='bx bx-menu' id="btn"></i>
+        <i class='bx bx-menu ' id="btn"></i>
     </div>
-    <ul class="nav-list">
+    <ul class="nav-list ">
         <li>
-            <i class='bx bx-search'></i>
+            <i class='bx bx-search myIcon'></i>
             <input type="text" placeholder="Search...">
             <span class="tooltip">Search</span>
         </li>
         <li>
             <a href="#">
-                <i class='bx bx-home'></i>
+                <i class='bx bx-home myIcon'></i>
                 <span class="links_name">Home</span>
             </a>
             <span class="tooltip">Home</span>
         </li>
         <li>
             <a href="#">
-                <i class='bx bx-user'></i>
+                <i class='bx bx-user myIcon'></i>
                 <span class="links_name">Account</span>
             </a>
             <span class="tooltip">Account</span>
         </li>
         <li>
             <a href="#">
-                <i class='bx bxs-medal'></i>
+                <i class='bx bxs-medal myIcon'></i>
                 <span class="links_name">Leaderboard</span>
             </a>
             <span class="tooltip">Leaderboard</span>
         </li>
         <li>
             <a href="#">
-                <i class='bx bx-edit'></i>
+                <i class='bx bx-edit myIcon'></i>
                 <span class="links_name">Tests</span>
             </a>
             <span class="tooltip">Tests</span>
         </li>
 
         <li class="profile">
-            <div class="profile-details">
+            <div class="profile-details ">
                 <img src="profile.jpg" alt="profileImg">
                 <div class="name_job">
                     <div class="name">Test User</div>
@@ -62,5 +56,3 @@
 </div>
 
 {#<script src="{% static 'js/header.js' %}"></script>#}
-</body>
-</html>
