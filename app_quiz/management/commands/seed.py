@@ -1,6 +1,10 @@
 import json
+
 from django.core.management.base import BaseCommand
-from app_quiz.models import Quiz, QuizSection, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information
+
+from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, \
+    Information
+
 
 # Define a custom management command for Django
 class Command(BaseCommand):
