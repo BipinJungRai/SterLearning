@@ -12,8 +12,15 @@
     <body>
 
     {% if user.is_authenticated %}
-        <li><a href="">{{ user.username }}</a></li>
-        <li><a href="{% url 'logout' %}">Logout</a></li>
+        <div class="logout-container">
+            <div class="logout">
+                <div class="username-box">
+                    <h1>{{ user.username }}</h1>
+                </div>
+                <a href="{% url 'logout' %}" class="btn">Logout</a>
+                <i class='bx bx-log-out'></i>
+            </div>
+        </div>
     {% else %}
         <div class="login-container">
             <div class="wrapper">
