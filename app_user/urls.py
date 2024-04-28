@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index, AuthGoogle, changeUsername, user_signup, user_login, user_logout, user_settings, user_tools
+from .views import *
 
 urlpatterns = [
     path("", index, name="index"),
@@ -10,4 +10,6 @@ urlpatterns = [
     path("logout", user_logout, name="logout"),
     path("settings", user_settings, name="settings"),
     path("tools", user_tools, name="tools"),
+    path("send_friend_request/<int:userID>/", send_friend_request, name="send-friend-request"),
+    path("accept_friend_request/<int:userID>/", accept_friend_request, name="accept-friend-request"),
 ]

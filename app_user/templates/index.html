@@ -8,6 +8,19 @@
     {% if user.is_authenticated %}
     <li> <a href="">{{user.username}}</a> </li>
     <li> <a href="{% url 'logout' %}">Logout</a> </li>
+    <h1>Friends</h1>
+    <ul class="all_users">
+        {% for user in users %}
+        {% if not user.is_superuser %}
+        {% if user not in request.user.friends.all and user != request.user %}
+        <li>{{user}} <a href="/send_friend_request/{{user.id}}/">send friend request</a></li>
+        {% for friend_request in requestList %}
+        <li>{{friend_request.from_user}} <a href="/accept_friend_request/{{friend_request.id}}/"></a>accept friend request</li>
+        {% endfor %}
+        {% endif %}
+        {% endif %}
+        {% endfor %}
+    </ul>
     {% else %}
     <li> <a href="{% url 'login' %}">Login</a> </li>
     <li> <a href="{% url 'signup-user' %}">Signup</a> </li>

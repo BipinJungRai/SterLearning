@@ -1,6 +1,6 @@
 from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
 from django.views.generic import CreateView
-from .models import ExtendedUser
+from .models import ExtendedUser, FriendRequest
 from django.urls import reverse_lazy
 import os
 from django.shortcuts import render, redirect
@@ -17,7 +17,9 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    userList = ExtendedUser.objects.all()
+    requestList = FriendRequest.objects.all()
+    return render(request, 'index.html', {'users': userList, 'requestList': requestList})
 
 def user_signup(request):
     if request.method == 'POST':
@@ -102,3 +104,26 @@ def user_settings(request):
 
 def user_tools(request):
     return render(request, 'tools.html')
+
+@login_required
+def send_friend_request(request, userID):
+    from_user = request.user
+    to_user = ExtendedUser.objects.get(id=userID)
+    friend_request, created = FriendRequest.objects.get_or_create(
+        from_user=from_user, to_user=to_user
+    )
+    if created:
+        return HttpResponse('friend request sent')
+    else:
+        return HttpResponse('request was already sent')
+
+@login_required
+def accept_friend_request(request, requestID):
+    friend_request = FriendRequest.objects.get(id=requestID)
+    if friend_request.to_user == request.user:
+        friend_request.to_user.friends.add(friend_request.from_user)
+        friend_request.from_user.friends.add(friend_request.to_user)
+        friend_request.delete()
+        return HttpResponse('request accepted')
+    else:
+        return HttpResponse('request not accepted')

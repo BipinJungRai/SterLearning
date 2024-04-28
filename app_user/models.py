@@ -27,6 +27,7 @@ class ExtendedUser(AbstractUser):
     email = models.EmailField(null=False, blank=False) #User must have an email to log in, so cannot be null
     inventoryAvatar = models.ManyToManyField(Avatar, blank=True, related_name='%(class)s_avatars_stored') #Inventory starts empty, so can be blank
     inventoryDecoration = models.ManyToManyField(Decoration, blank=True, related_name='%(class)s_decorations_stored') #Inventory starts empty, so can be blank
+    friends = models.ManyToManyField("ExtendedUser", blank=True)
 
     def __str__(self):
         return self.username
@@ -46,3 +47,6 @@ class PointsAwarded(models.Model):
     points = models.IntegerField()
     time = models.DateTimeField(auto_now_add = True)
 
+class FriendRequest(models.Model):
+    from_user = models.ForeignKey(ExtendedUser, related_name='from_user', on_delete = models.CASCADE)
+    to_user = models.ForeignKey(ExtendedUser, related_name='to_user', on_delete = models.CASCADE)
