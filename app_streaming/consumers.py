@@ -83,6 +83,10 @@ class QuizConsumer(WebsocketConsumer):
             }
         ))
 
+    def disconnect(self, close_code):
+        self.attempt.quiz_open = False
+        self.attempt.save()
+
     def receive(self, text_data):
         data = json.loads(text_data)
         result = None
@@ -115,9 +119,13 @@ class QuizConsumer(WebsocketConsumer):
                         }
                     ))
                 
+                awarded = PointsAwarded(user = self.user,
+                                        points = points)
+                awarded.save()
+                
                 response = MultipleChoiceResponse(attempt = self.attempt,
                                                   answer = selected,
-                                                  points_awarded = points)
+                                                  points_awarded = awarded)
                 response.save()
             elif data["section_type"] == "fib":
                 total = 0
@@ -136,9 +144,13 @@ class QuizConsumer(WebsocketConsumer):
                         points = s.points
                         correct.append(sid)
 
+                    awarded = PointsAwarded(user = self.user,
+                                        points = points)
+                    awarded.save()
+
                     answer = FillInBlankAnswer(response = response,
                                                blank = blank,
-                                               points_awarded = points,
+                                               points_awarded = awarded,
                                                sentence = s)
                     answer.save()
                 
@@ -185,9 +197,9 @@ class QuizConsumer(WebsocketConsumer):
             qid = data["qid"]
             quiz = get_object_or_404(Quiz, id = qid)
             result = get_section(quiz, 1)
-            #tempuser,created = ExtendedUser.objects.get_or_create(username = "test") # can be removed once middleware done
 
-            attempt = Attempt(user = self.user, # should be self.user once middleware done
+            print(self.user)
+            attempt = Attempt(user = self.user,
                               quiz = quiz,
                               completed = False,
                               quiz_open = True)
