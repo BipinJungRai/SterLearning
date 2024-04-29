@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index, AuthGoogle, changeUsername, user_signup, user_login, user_logout, user_settings, user_tools
+from .views import index, AuthGoogle, changeUsername, user_signup, user_login, user_logout, user_settings
 
 urlpatterns = [
     path("", index, name="index"),
@@ -9,5 +9,4 @@ urlpatterns = [
     path("login", user_login, name="login"),
     path("logout", user_logout, name="logout"),
     path("settings", user_settings, name="settings"),
-    path("tools", user_tools, name="tools"),
 ]

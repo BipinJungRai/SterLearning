@@ -99,6 +99,3 @@ def user_logout(request):
 
 def user_settings(request):
     return render(request, 'settings.html')
-
-def user_tools(request):
-    return render(request, 'tools.html')
