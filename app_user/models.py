@@ -63,4 +63,9 @@ class Friend(models.Model):
             current_user=current_user
         )
         friend.users.remove(new_friend)
-    
+
+class FriendRequest(models.Model):
+    # store the user that has sent the request
+    sent_from = models.ForeignKey(ExtendedUser, related_name="requests_sent", on_delete= models.CASCADE)
+    # store the user that has received the request
+    sent_to = models.ForeignKey(ExtendedUser, related_name="requests_received", on_delete= models.CASCADE)

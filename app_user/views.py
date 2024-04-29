@@ -1,6 +1,6 @@
 from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
 from django.views.generic import CreateView
-from .models import ExtendedUser, Friend
+from .models import ExtendedUser, Friend, FriendRequest
 from django.urls import reverse_lazy
 import os
 from django.shortcuts import render, redirect
@@ -17,13 +17,7 @@ from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 def index(request):
-    users = ExtendedUser.objects.all()
-    friends = {}
-    if request.user.is_authenticated:
-        if Friend.objects.filter(current_user=request.user):
-            friend = Friend.objects.get(current_user=request.user)
-            friends = friend.users.all()
-    return render(request, 'index.html', {'users':users, 'friends':friends})
+    return render(request, 'index.html')
 
 def user_signup(request):
     if request.method == 'POST':
@@ -113,10 +107,43 @@ def add_friend(request, userID):
     new_friend = ExtendedUser.objects.get(id=userID)
     Friend.make_friend(request.user, new_friend)
     Friend.make_friend(new_friend, request.user)
-    return redirect('index')
 
 def remove_friend(request, userID):
     new_friend = ExtendedUser.objects.get(id=userID)
     Friend.remove_friend(request.user, new_friend)
     Friend.remove_friend(new_friend, request.user)
-    return redirect('index')
+    return redirect('friends')
+
+def user_friends(request):
+    users = ExtendedUser.objects.all()
+    friends = {}
+    sent_friend_requests = {}
+    recieved_friend_requests = {}
+    if request.user.is_authenticated:
+        if Friend.objects.filter(current_user=request.user):
+            friend = Friend.objects.get(current_user=request.user)
+            friends = friend.users.all()
+        if FriendRequest.objects.filter(sent_from=request.user):
+            sent_friend_requests = FriendRequest.objects.all().filter(sent_from=request.user)
+        if FriendRequest.objects.filter(sent_to=request.user):
+            recieved_friend_requests = FriendRequest.objects.all().filter(sent_to=request.user)
+    return render(request, 'friends.html', {'users':users, 'friends':friends, 'sent_requests':sent_friend_requests, 'received_requests':recieved_friend_requests})
+
+def send_friend_request(request, userID):
+    new_friend = ExtendedUser.objects.get(id=userID)
+    friend_request = FriendRequest.objects.get_or_create(sent_from=request.user, sent_to=new_friend)
+    return redirect('friends')
+
+def remove_friend_request(request, userID):
+    new_friend = ExtendedUser.objects.get(id=userID)
+    friend_request = FriendRequest.objects.get(sent_from=new_friend, sent_to=request.user)
+    friend_request.delete()
+    
+def deny_friend_request(request, userID):
+    remove_friend_request(request, userID)
+    return redirect('friends')
+
+def accept_friend_request(request, userID):
+    add_friend(request, userID)
+    remove_friend_request(request, userID)
+    return redirect('friends')

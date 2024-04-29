@@ -8,23 +8,7 @@
     {% if user.is_authenticated %}
         <li> <a href="">{{user.username}}</a> </li>
         <li> <a href="{% url 'logout' %}">Logout</a> </li>
-        <h2>Other Users</h2>
-        <ul>
-        {% for user in users %}
-            {% if user != request.user %}
-                <li>{{ user.username }}</li>
-                {% if user not in friends %}
-                    <a href="{% url 'add-friend' user.id %}">Add Friend</a>
-                {% endif %}
-            {% endif %}
-        {% endfor %}
-        <h2>Friends</h2>
-        <ul>
-        {% for user in friends %}
-            <li>{{ user.username }}</li>
-            <a href="{% url 'remove-friend' user.id %}">Remove Friend</a>
-        {% endfor %}
-        </ul>
+        <li> <a href="{% url 'friends' %}">Friends</a></li>
     {% else %}
         </ul>
         <li> <a href="{% url 'login' %}">Login</a> </li>
