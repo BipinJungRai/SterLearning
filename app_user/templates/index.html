@@ -6,40 +6,45 @@
 </head>
 <body>
     {% if user.is_authenticated %}
-    <li> <a href="">{{user.username}}</a> </li>
-    <li> <a href="{% url 'logout' %}">Logout</a> </li>
-    <h1>Friends</h1>
-    <ul class="all_users">
+        <li> <a href="">{{user.username}}</a> </li>
+        <li> <a href="{% url 'logout' %}">Logout</a> </li>
+        <h2>Other Users</h2>
+        <ul>
         {% for user in users %}
-        {% if not user.is_superuser %}
-        {% if user not in request.user.friends.all and user != request.user %}
-        <li>{{user}} <a href="/send_friend_request/{{user.id}}/">send friend request</a></li>
-        {% for friend_request in requestList %}
-        <li>{{friend_request.from_user}} <a href="/accept_friend_request/{{friend_request.id}}/"></a>accept friend request</li>
+            {% if user != request.user %}
+                <li>{{ user.username }}</li>
+                {% if user not in friends %}
+                    <a href="{% url 'add-friend' user.id %}">Add Friend</a>
+                {% endif %}
+            {% endif %}
         {% endfor %}
-        {% endif %}
-        {% endif %}
+        <h2>Friends</h2>
+        <ul>
+        {% for user in friends %}
+            <li>{{ user.username }}</li>
+            <a href="{% url 'remove-friend' user.id %}">Remove Friend</a>
         {% endfor %}
-    </ul>
+        </ul>
     {% else %}
-    <li> <a href="{% url 'login' %}">Login</a> </li>
-    <li> <a href="{% url 'signup-user' %}">Signup</a> </li>
-    <div id="g_id_onload"
-        data-client_id="385254237271-qsm2re5si8iskcuqlu14b1rr09jd5oha.apps.googleusercontent.com"
-        data-context="signin"
-        data-ux_mode="redirect"
-        data-login_uri="http://localhost:8000/accounts/auth-receiver"
-        data-itp_support="true">
-    </div>
+        </ul>
+        <li> <a href="{% url 'login' %}">Login</a> </li>
+        <li> <a href="{% url 'signup-user' %}">Signup</a> </li>
+        <div id="g_id_onload"
+            data-client_id="385254237271-qsm2re5si8iskcuqlu14b1rr09jd5oha.apps.googleusercontent.com"
+            data-context="signin"
+            data-ux_mode="redirect"
+            data-login_uri="http://localhost:8000/accounts/auth-receiver"
+            data-itp_support="true">
+        </div>
 
-    <div class="g_id_signin"
-        data-type="standard"
-        data-shape="rectangular"
-        data-theme="outline"
-        data-text="signin_with"
-        data-size="large"
-        data-logo_alignment="left">
-    </div>
+        <div class="g_id_signin"
+            data-type="standard"
+            data-shape="rectangular"
+            data-theme="outline"
+            data-text="signin_with"
+            data-size="large"
+            data-logo_alignment="left">
+        </div>
     {% endif%}
 </body>
 </html>

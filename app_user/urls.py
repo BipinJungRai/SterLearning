@@ -10,6 +10,6 @@ urlpatterns = [
     path("logout", user_logout, name="logout"),
     path("settings", user_settings, name="settings"),
     path("tools", user_tools, name="tools"),
-    path("send_friend_request/<int:userID>/", send_friend_request, name="send-friend-request"),
-    path("accept_friend_request/<int:userID>/", accept_friend_request, name="accept-friend-request"),
+    path("add_friend/<int:userID>/", add_friend, name="add-friend"),
+    path("remove_friend/<int:userID>/", remove_friend, name="remove-friend"),
 ]
