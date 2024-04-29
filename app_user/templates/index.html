@@ -9,6 +9,7 @@
         <li> <a href="">{{user.username}}</a> </li>
         <li> <a href="{% url 'logout' %}">Logout</a> </li>
         <li> <a href="{% url 'friends' %}">Friends</a></li>
+        <li> <a href="{% url 'settings' %}">Settings</a></li>
     {% else %}
         </ul>
         <li> <a href="{% url 'login' %}">Login</a> </li>
