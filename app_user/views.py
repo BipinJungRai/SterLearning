@@ -53,7 +53,7 @@ class AuthGoogle(APIView):
                 first_name=user_data["given_name"],
                 )
             login(request, user)
-            return redirect('change_username')
+            return redirect('change-username')
 
         if user is not None:
             login(request, user)
@@ -96,3 +96,6 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+def user_settings(request):
+    return render(request, 'settings.html')
