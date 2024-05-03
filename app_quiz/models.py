@@ -1,7 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext
-from app_user.models import ExtendedUser
+from app_user.models import ExtendedUser, PointsAwarded
 
 
 # Verifies that no two sections share the same positions
@@ -129,7 +129,7 @@ class Attempt(models.Model):
 class MultipleChoiceResponse(models.Model):
     attempt = models.ForeignKey(Attempt, on_delete = models.CASCADE)
     answer = models.ForeignKey(MultipleChoiceOptions, on_delete = models.CASCADE)
-    points_awarded = models.IntegerField()
+    points_awarded = models.ForeignKey(PointsAwarded, on_delete = models.CASCADE)
 
 
 # Model to represent a user's answer to a FIB
@@ -141,5 +141,5 @@ class FillInBlankReponse(models.Model):
 class FillInBlankAnswer(models.Model):
     response = models.ForeignKey(FillInBlankReponse, on_delete = models.CASCADE)
     blank = models.CharField(null = True, blank = True, max_length = 100)
-    points_awarded = models.IntegerField()
+    points_awarded = models.ForeignKey(PointsAwarded, on_delete = models.CASCADE)
     sentence = models.ForeignKey(FillInBlankSentence, on_delete = models.CASCADE)
