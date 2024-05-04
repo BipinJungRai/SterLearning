@@ -9,6 +9,7 @@ from django.utils.translation import gettext_lazy as _
 class Decoration(models.Model):
     name = models.CharField(max_length=128)
     image = models.ImageField(upload_to='images/', null=False, blank=False)
+    cost = models.IntegerField(default = 25)
 
     def __str__(self):
         return self.name
@@ -16,6 +17,7 @@ class Decoration(models.Model):
 class Avatar(models.Model):
     name = models.CharField(max_length=128)
     image = models.ImageField(upload_to='images/', null=False, blank=False)
+    cost = models.IntegerField(default = 25)
 
     def __str__(self):
         return self.name
@@ -27,6 +29,7 @@ class ExtendedUser(AbstractUser):
     email = models.EmailField(null=False, blank=False) #User must have an email to log in, so cannot be null
     inventoryAvatar = models.ManyToManyField(Avatar, blank=True, related_name='%(class)s_avatars_stored') #Inventory starts empty, so can be blank
     inventoryDecoration = models.ManyToManyField(Decoration, blank=True, related_name='%(class)s_decorations_stored') #Inventory starts empty, so can be blank
+    spentPoints = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.username
@@ -38,7 +41,7 @@ class ExtendedUser(AbstractUser):
         for i in points:
             total += i.points
 
-        return total
+        return total - self.spentPoints
     
 # Model to track when a user recieves points
 class PointsAwarded(models.Model):

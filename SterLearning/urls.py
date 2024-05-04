@@ -16,7 +16,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls.static import static
 from app_quiz import views as quiz_views
+from app_user import views as user_views
 
 # These are the URL patterns specific to the 5 pathways.
 # learn/ is stripped from the start of the URL in the main pattern.
@@ -33,5 +36,6 @@ urlpatterns = [
     path("admin/", admin.site.urls),
     path("learn/", include(pathway_patterns)),
     path("quiz/<int:qid>/", quiz_views.quiz, name="quiz-views-quiz"),
+    path("shop/", user_views.shop, name="shop"),
     path("accounts/", include("app_user.urls")),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
