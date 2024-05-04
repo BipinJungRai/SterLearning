@@ -14,6 +14,7 @@ from pathlib import Path
 
 import os
 from dotenv import load_dotenv
+from django.contrib import messages
 
 
 load_dotenv()
@@ -148,3 +149,7 @@ AUTH_USER_MODEL = "app_user.ExtendedUser"
 
 LOGIN_REDIRECT_URL = "/"
 LOGOUT_REDIRECT_URL = "/"
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger"
+}
