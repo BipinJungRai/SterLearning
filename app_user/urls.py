@@ -15,4 +15,7 @@ urlpatterns = [
     path("friends", user_friends, name="friends"),
     path("deny_friend_request/<int:userID>/", deny_friend_request, name="deny-friend-request"),
     path("accept_friend_request/<int:userID>/", accept_friend_request, name="accept-friend-request"),
+    path("notification/<int:notificationID>/", notification, name="notification"),
+    path("friend_suggestion/", friend_suggestion, name="friend-suggestion"),
+    path("notification_socket", notification_socket, name="notification-socket"),
 ]

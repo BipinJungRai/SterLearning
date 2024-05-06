@@ -5,6 +5,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from datetime import datetime
 
 class Decoration(models.Model):
     name = models.CharField(max_length=128)
@@ -69,3 +70,9 @@ class FriendRequest(models.Model):
     sent_from = models.ForeignKey(ExtendedUser, related_name="requests_sent", on_delete= models.CASCADE)
     # store the user that has received the request
     sent_to = models.ForeignKey(ExtendedUser, related_name="requests_received", on_delete= models.CASCADE)
+
+class Notification(models.Model):
+    is_read = models.BooleanField(default=False)
+    message = models.CharField(max_length=100)
+    user = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(default=datetime.now)

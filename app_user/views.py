@@ -1,6 +1,6 @@
 from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
 from django.views.generic import CreateView
-from .models import ExtendedUser, Friend, FriendRequest
+from .models import ExtendedUser, Friend, FriendRequest, Notification
 from django.urls import reverse_lazy
 import os
 from django.shortcuts import render, redirect
@@ -14,6 +14,9 @@ import uuid
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from app_quiz.models import Attempt
+import random
+from django.db.models import Q
 
 # Create your views here.
 def index(request):
@@ -115,23 +118,27 @@ def remove_friend(request, userID):
     return redirect('friends')
 
 def user_friends(request):
-    users = ExtendedUser.objects.all()
-    friends = {}
-    sent_friend_requests = {}
-    recieved_friend_requests = {}
     if request.user.is_authenticated:
-        if Friend.objects.filter(current_user=request.user):
-            friend = Friend.objects.get(current_user=request.user)
-            friends = friend.users.all()
-        if FriendRequest.objects.filter(sent_from=request.user):
-            sent_friend_requests = FriendRequest.objects.all().filter(sent_from=request.user)
-        if FriendRequest.objects.filter(sent_to=request.user):
-            recieved_friend_requests = FriendRequest.objects.all().filter(sent_to=request.user)
-    return render(request, 'friends.html', {'users':users, 'friends':friends, 'sent_requests':sent_friend_requests, 'received_requests':recieved_friend_requests})
+        users = ExtendedUser.objects.all()
+        friends = {}
+        sent_friend_requests = {}
+        recieved_friend_requests = {}
+        if request.user.is_authenticated:
+            if Friend.objects.filter(current_user=request.user):
+                friend = Friend.objects.get(current_user=request.user)
+                friends = friend.users.all()
+            if FriendRequest.objects.filter(sent_from=request.user):
+                sent_friend_requests = FriendRequest.objects.all().filter(sent_from=request.user)
+            if FriendRequest.objects.filter(sent_to=request.user):
+                recieved_friend_requests = FriendRequest.objects.all().filter(sent_to=request.user)
+        return render(request, 'friends.html', {'users':users, 'friends':friends, 'sent_requests':sent_friend_requests, 'received_requests':recieved_friend_requests})
+    else:
+        return redirect('login')
 
 def send_friend_request(request, userID):
     new_friend = ExtendedUser.objects.get(id=userID)
     friend_request = FriendRequest.objects.get_or_create(sent_from=request.user, sent_to=new_friend)
+    notification = Notification.objects.get_or_create(message="Friend request: " + request.user.username, user=ExtendedUser.objects.get(id=userID))
     return redirect('friends')
 
 def remove_friend_request(request, userID):
@@ -147,3 +154,32 @@ def accept_friend_request(request, userID):
     add_friend(request, userID)
     remove_friend_request(request, userID)
     return redirect('friends')
+
+def notification(request, notificationID):
+    notification = Notification.objects.get(id=notificationID)
+    notification.delete()
+    return redirect('friends')
+
+def friend_suggestion(request):
+    quizzes = {}
+    user_attempts = Attempt.objects.all().filter(user=request.user)
+    for attempt in user_attempts:
+        if attempt.completed:
+            quizzes[attempt.quiz] = attempt.completed
+    print(quizzes)
+    quiz = random.choice(list(quizzes.keys()))
+    other_attempts = Attempt.objects.all().filter(~Q(user=request.user))
+    other_users = []
+    for attempt in other_attempts:
+        other_users.append(attempt.user)
+    other_users = list(dict.fromkeys(other_users)) #remove duplicates
+    if len(other_users) > 0:
+        friend = random.choice(other_users)
+        notification = Notification.objects.get_or_create(message="Friend Suggestion: " + friend.username + " has completed the " + quiz.name + " quiz too!", user=request.user)
+    return redirect('pathways-home')
+
+def notification_socket(request):
+    latest = Notification.objects.latest("date_created")
+    latest.delete()
+    return redirect('friends')
+    
