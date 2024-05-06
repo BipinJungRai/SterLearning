@@ -2,7 +2,8 @@ import json
 import os
 
 from django.core.management.base import BaseCommand
-from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence
+from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information
+
 
 class Command(BaseCommand):
     """Django command to load data from JSON files into the Quiz model."""
@@ -14,16 +15,36 @@ class Command(BaseCommand):
 
         # Define the paths to the JSON files
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        payslips_and_taxes_quiz_json = os.path.join(base_dir, 'payslips_taxes_data.json')
-        budgeting_quiz_json = os.path.join(base_dir, 'budget_data.json')
+        calc_tax_quiz_json = os.path.join(base_dir, 'json_pathways/tax_data/calc_tax_data.json')
+        payslip_reading_quiz_json = os.path.join(base_dir, 'json_pathways/tax_data/payslip_reading_data.json')
+        diff_in_partfull_quiz_json = os.path.join(base_dir, 'json_pathways/tax_data/diff_in_partfull_data.json')
+        budget_paycheck_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/budget_paycheck_data.json')
+        rent_bills_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/rent_bills_data.json')
+        save_money_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/save_money_data.json')
 
-        # Load Payslips and Taxes Quiz data
-        with open(payslips_and_taxes_quiz_json, 'r') as f:
-            payslips_and_taxes_quiz_data = json.load(f)
+        # Load Calculating Taxes Quiz data
+        with open(calc_tax_quiz_json, 'r') as f:
+            calc_tax_quiz_data = json.load(f)
 
-        # Load Budgeting Quiz data
-        with open(budgeting_quiz_json, 'r') as f:
-            budgeting_quiz_data = json.load(f)
+        # Load Payslip Reading Quiz data
+        with open(payslip_reading_quiz_json, 'r') as f:
+            payslip_reading_quiz_data = json.load(f)
+
+        # Load Differences in Part-time and Full-time Pay Quiz data
+        with open(diff_in_partfull_quiz_json, 'r') as f:
+            diff_in_partfull_quiz_data = json.load(f)
+
+        # Load Budget Paycheck Quiz data
+        with open(budget_paycheck_quiz_json, 'r') as f:
+            budget_paycheck_quiz_data = json.load(f)
+
+        # Load Rent Bills Quiz data
+        with open(rent_bills_quiz_json, 'r') as f:
+            rent_bills_quiz_data = json.load(f)
+
+        # Load Save Money Quiz data
+        with open(save_money_quiz_json, 'r') as f:
+            save_money_quiz_data = json.load(f)
 
         # Delete existing data
         Quiz.objects.all().delete()
@@ -32,13 +53,25 @@ class Command(BaseCommand):
         FillInBlank.objects.all().delete()
         FillInBlankSentence.objects.all().delete()
 
-        # Seed data for Payslips and Taxes Quiz
-        self.seed_quiz_data(payslips_and_taxes_quiz_data)
-        self.stdout.write(self.style.SUCCESS('Data for Payslips and Taxes Quiz loaded successfully!'))
+        # Seed data for each quiz
+        self.seed_quiz_data(calc_tax_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Calculating Taxes Quiz loaded successfully!'))
 
-        # Seed data for Budgeting Quiz
-        self.seed_quiz_data(budgeting_quiz_data)
-        self.stdout.write(self.style.SUCCESS('Data for Budgeting Quiz loaded successfully!'))
+        self.seed_quiz_data(payslip_reading_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Payslip Reading Quiz loaded successfully!'))
+
+        self.seed_quiz_data(diff_in_partfull_quiz_data)
+        self.stdout.write(
+            self.style.SUCCESS('Data for Differences in Part-time and Full-time Pay Quiz loaded successfully!'))
+
+        self.seed_quiz_data(budget_paycheck_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Budget Paycheck Quiz loaded successfully!'))
+
+        self.seed_quiz_data(rent_bills_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Rent Bills Quiz loaded successfully!'))
+
+        self.seed_quiz_data(save_money_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Save Money Quiz loaded successfully!'))
 
     def seed_quiz_data(self, quiz_data):
         """Seeds data for a single quiz."""
@@ -51,40 +84,52 @@ class Command(BaseCommand):
 
         # Loop through each section in the quiz data
         for section_data in quiz_data['sections']:
-            # Loop through each question in the section
-            for question_data in section_data['questions']:
-                if question_data['type'] == 'Multiple Choice':
-                    # Create a new MultipleChoice question
-                    question = MultipleChoice.objects.create(
-                        title=question_data['question'],  # Used 'question' from JSON as 'title'
-                        quiz=quiz,
-                        position=section_data['position'],
-                        points=question_data['points']
-                    )
-
-                    # Loop through each option for the question
-                    for option_text in question_data['options']:
-                        # Check if the option is the correct answer
-                        correct = option_text == question_data['correct_option']
-                        # Create a new MultipleChoiceOptions object for the option
-                        MultipleChoiceOptions.objects.create(
-                            text=option_text,
-                            correct=correct,
-                            question=question
+            # Check if the section is a question section or an info section
+            if 'questions' in section_data:
+                # Loop through each question in the section
+                for question_data in section_data['questions']:
+                    if question_data['type'] == 'Multiple Choice':
+                        # Create a new MultipleChoice question
+                        question = MultipleChoice.objects.create(
+                            title=question_data['question'],  # Used 'question' from JSON as 'title'
+                            quiz=quiz,
+                            position=question_data['position'],
+                            points=question_data['points']
                         )
-                elif question_data['type'] == 'Fill in the Blank':
-                    # Create a new FillInBlank question
-                    question = FillInBlank.objects.create(
-                        title=question_data['question'],  # Used 'question' from JSON as 'title'
-                        quiz=quiz,
-                        position=section_data['position']
-                    )
 
-                    # Create a new FillInBlankSentence object for the question
-                    FillInBlankSentence.objects.create(
-                        before=question_data['before'],
-                        blank=question_data['blank'],
-                        after=question_data['after'],
-                        question=question,
-                        points=question_data['points']
+                        # Loop through each option for the question
+                        for option_text in question_data['options']:
+                            # Check if the option is the correct answer
+                            correct = option_text == question_data['correct_option']
+                            # Create a new MultipleChoiceOptions object for the option
+                            MultipleChoiceOptions.objects.create(
+                                text=option_text,
+                                correct=correct,
+                                question=question
+                            )
+                    elif question_data['type'] == 'Fill in the Blank':
+                        # Create a new FillInBlank question
+                        question = FillInBlank.objects.create(
+                            title=question_data['question'],  # Used 'question' from JSON as 'title'
+                            quiz=quiz,
+                            position=question_data['position']
+                        )
+
+                        # Create a new FillInBlankSentence object for the question
+                        FillInBlankSentence.objects.create(
+                            before=question_data['before'],
+                            blank=question_data['blank'],
+                            after=question_data['after'],
+                            question=question,
+                            points=question_data['points']
+                        )
+            elif 'info' in section_data:
+                # Loop through each info in the section
+                for info_data in section_data['info']:
+                    # Create a new Information object
+                    Information.objects.create(
+                        title=info_data['title'],
+                        content=info_data['content'],
+                        quiz=quiz,
+                        position=info_data['position']
                     )
