@@ -14,16 +14,36 @@ class Command(BaseCommand):
 
         # Define the paths to the JSON files
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        payslips_and_taxes_quiz_json = os.path.join(base_dir, 'payslips_taxes_data.json')
-        budgeting_quiz_json = os.path.join(base_dir, 'budget_data.json')
+        calc_tax_quiz_json = os.path.join(base_dir, 'calc_tax_data.json')
+        payslip_reading_quiz_json = os.path.join(base_dir, 'payslip_reading_data.json')
+        diff_in_partfull_quiz_json = os.path.join(base_dir, 'diff_in_partfull_data.json')
+        budget_paycheck_quiz_json = os.path.join(base_dir, 'budget_paycheck_data.json')
+        rent_bills_quiz_json = os.path.join(base_dir, 'rent_bills_data.json')
+        save_money_quiz_json = os.path.join(base_dir, 'save_money_data.json')
 
-        # Load Payslips and Taxes Quiz data
-        with open(payslips_and_taxes_quiz_json, 'r') as f:
-            payslips_and_taxes_quiz_data = json.load(f)
+        # Load Calculating Taxes Quiz data
+        with open(calc_tax_quiz_json, 'r') as f:
+            calc_tax_quiz_data = json.load(f)
 
-        # Load Budgeting Quiz data
-        with open(budgeting_quiz_json, 'r') as f:
-            budgeting_quiz_data = json.load(f)
+        # Load Payslip Reading Quiz data
+        with open(payslip_reading_quiz_json, 'r') as f:
+            payslip_reading_quiz_data = json.load(f)
+
+        # Load Differences in Part-time and Full-time Pay Quiz data
+        with open(diff_in_partfull_quiz_json, 'r') as f:
+            diff_in_partfull_quiz_data = json.load(f)
+
+        # Load Budget Paycheck Quiz data
+        with open(budget_paycheck_quiz_json, 'r') as f:
+            budget_paycheck_quiz_data = json.load(f)
+
+        # Load Rent Bills Quiz data
+        with open(rent_bills_quiz_json, 'r') as f:
+            rent_bills_quiz_data = json.load(f)
+
+        # Load Save Money Quiz data
+        with open(save_money_quiz_json, 'r') as f:
+            save_money_quiz_data = json.load(f)
 
         # Delete existing data
         Quiz.objects.all().delete()
@@ -32,13 +52,25 @@ class Command(BaseCommand):
         FillInBlank.objects.all().delete()
         FillInBlankSentence.objects.all().delete()
 
-        # Seed data for Payslips and Taxes Quiz
-        self.seed_quiz_data(payslips_and_taxes_quiz_data)
-        self.stdout.write(self.style.SUCCESS('Data for Payslips and Taxes Quiz loaded successfully!'))
+        # Seed data for each quiz
+        self.seed_quiz_data(calc_tax_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Calculating Taxes Quiz loaded successfully!'))
 
-        # Seed data for Budgeting Quiz
-        self.seed_quiz_data(budgeting_quiz_data)
-        self.stdout.write(self.style.SUCCESS('Data for Budgeting Quiz loaded successfully!'))
+        self.seed_quiz_data(payslip_reading_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Payslip Reading Quiz loaded successfully!'))
+
+        self.seed_quiz_data(diff_in_partfull_quiz_data)
+        self.stdout.write(
+            self.style.SUCCESS('Data for Differences in Part-time and Full-time Pay Quiz loaded successfully!'))
+
+        self.seed_quiz_data(budget_paycheck_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Budget Paycheck Quiz loaded successfully!'))
+
+        self.seed_quiz_data(rent_bills_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Rent Bills Quiz loaded successfully!'))
+
+        self.seed_quiz_data(save_money_quiz_data)
+        self.stdout.write(self.style.SUCCESS('Data for Save Money Quiz loaded successfully!'))
 
     def seed_quiz_data(self, quiz_data):
         """Seeds data for a single quiz."""
@@ -58,7 +90,7 @@ class Command(BaseCommand):
                     question = MultipleChoice.objects.create(
                         title=question_data['question'],  # Used 'question' from JSON as 'title'
                         quiz=quiz,
-                        position=section_data['position'],
+                        position=question_data['position'],  # Changed from section_data to question_data
                         points=question_data['points']
                     )
 
@@ -77,7 +109,7 @@ class Command(BaseCommand):
                     question = FillInBlank.objects.create(
                         title=question_data['question'],  # Used 'question' from JSON as 'title'
                         quiz=quiz,
-                        position=section_data['position']
+                        position=question_data['position']  # Changed from section_data to question_data
                     )
 
                     # Create a new FillInBlankSentence object for the question
