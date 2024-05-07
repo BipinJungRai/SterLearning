@@ -14,6 +14,7 @@ from pathlib import Path
 
 import os
 from dotenv import load_dotenv
+from django.contrib import messages
 
 
 load_dotenv()
@@ -155,3 +156,8 @@ CHANNEL_LAYERS = {
         'BACKEND': "channels.layers.InMemoryChannelLayer"
     }
 }
+
+MESSAGE_TAGS = {
+    messages.ERROR: "danger"
+}
+

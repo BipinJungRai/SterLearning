@@ -1,9 +1,9 @@
 from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
 from django.views.generic import CreateView
-from .models import ExtendedUser, Friend, FriendRequest, Notification
+from .models import ExtendedUser, Friend, FriendRequest, Notification, Avatar, Decoration
 from django.urls import reverse_lazy
 import os
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.http import HttpResponse, HttpRequest
@@ -18,10 +18,15 @@ from app_quiz.models import Attempt
 import random
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django.contrib import messages
+
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    if request.user.is_authenticated:
+        return redirect('pathways-home')
+    else:
+        return redirect('login')
 
 def user_signup(request):
     if request.method == 'POST':
@@ -185,3 +190,77 @@ def notification_socket(request):
         notification.delete()
         return redirect('friends')
     
+def shop(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user = request.user
+            requestType = request.POST.get('type')
+            requestId = request.POST.get('id')
+
+            if requestType == 'buy_avatar':
+                avatar = get_object_or_404(Avatar, id = requestId)
+
+                if user.points() >= avatar.cost:
+                    user.spentPoints += avatar.cost
+                    user.inventoryAvatar.add(avatar)
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'purchased ' + avatar.name + ' for ' + str(avatar.cost) + 
+                                          ' points!')
+                else:
+                    messages.add_message(request, messages.ERROR, 'You do not have enough' +
+                                           ' points for this item! Complete more quizzes to ' +
+                                           'earn more points.')
+            elif requestType == 'buy_decoration':
+                decoration = get_object_or_404(Decoration, id = requestId)
+                
+                if user.points() >= decoration.cost:
+                    user.spentPoints += decoration.cost
+                    user.inventoryDecoration.add(decoration)
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'purchased ' + decoration.name + ' for ' + str(decoration.cost) + 
+                                          ' points!')
+                else:
+                    messages.add_message(request, messages.ERROR, 'You do not have enough' +
+                                           ' points for this item! Complete more quizzes to ' +
+                                           'earn more points.')
+            elif requestType == 'equip_avatar':
+                avatar = get_object_or_404(Avatar, id = requestId)
+
+                if user.inventoryAvatar.all().filter(id = requestId).count() == 1:
+                    user.avatar = avatar
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'equipped ' + avatar.name)
+                else:
+                    messages.add_message(request, messages.ERROR, 'You are unable to equip this.')
+            elif requestType == 'equip_decoration':
+                decoration = get_object_or_404(Decoration, id = requestId)
+
+                if user.inventoryDecoration.all().filter(id = requestId).count() == 1:
+                    user.decoration = decoration
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'equipped ' + decoration.name)
+                else:
+                    messages.add_message(request, messages.ERROR, 'You are unable to equip this.')
+
+        context = {}
+        context['points'] = request.user.points
+        context['equipped_avatar'] = request.user.avatar
+        context['equipped_decoration'] = request.user.decoration
+        context['owned_avatars'] = request.user.inventoryAvatar.all()
+        context['owned_decorations'] = request.user.inventoryDecoration.all()
+        context['avatars'] = Avatar.objects.exclude(id__in = context['owned_avatars'])
+        context['decorations'] = Decoration.objects.exclude(id__in = context['owned_decorations'])
+
+        return render(request, 'shop.html', context)
+    else:
+        messages.add_message(request, messages.ERROR, 'You need to be logged in')
+        return redirect('login')
+
