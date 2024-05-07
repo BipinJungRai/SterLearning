@@ -1,9 +1,9 @@
 from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
 from django.views.generic import CreateView
-from .models import ExtendedUser
+from .models import ExtendedUser, Friend, FriendRequest, Notification, Avatar, Decoration
 from django.urls import reverse_lazy
 import os
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from django.http import HttpResponse, HttpRequest
@@ -14,10 +14,19 @@ import uuid
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
+from app_quiz.models import Attempt
+import random
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
+from django.contrib import messages
+
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    if request.user.is_authenticated:
+        return redirect('pathways-home')
+    else:
+        return redirect('login')
 
 def user_signup(request):
     if request.method == 'POST':
@@ -53,7 +62,7 @@ class AuthGoogle(APIView):
                 first_name=user_data["given_name"],
                 )
             login(request, user)
-            return redirect('change_username')
+            return redirect('change-username')
 
         if user is not None:
             login(request, user)
@@ -96,3 +105,162 @@ def user_login(request):
 def user_logout(request):
     logout(request)
     return redirect('login')
+
+def user_settings(request):
+    return render(request, 'settings.html')
+
+def user_tools(request):
+    return render(request, 'tools.html')
+
+def add_friend(request, userID):
+    new_friend = ExtendedUser.objects.get(id=userID)
+    Friend.make_friend(request.user, new_friend)
+    Friend.make_friend(new_friend, request.user)
+
+def remove_friend(request, userID):
+    new_friend = ExtendedUser.objects.get(id=userID)
+    Friend.remove_friend(request.user, new_friend)
+    Friend.remove_friend(new_friend, request.user)
+    return redirect('friends')
+
+def user_friends(request):
+    if request.user.is_authenticated:
+        users = ExtendedUser.objects.all()
+        friends = {}
+        sent_friend_requests = {}
+        recieved_friend_requests = {}
+        if request.user.is_authenticated:
+            if Friend.objects.filter(current_user=request.user):
+                friend = Friend.objects.get(current_user=request.user)
+                friends = friend.users.all()
+            if FriendRequest.objects.filter(sent_from=request.user):
+                sent_friend_requests = FriendRequest.objects.all().filter(sent_from=request.user)
+            if FriendRequest.objects.filter(sent_to=request.user):
+                recieved_friend_requests = FriendRequest.objects.all().filter(sent_to=request.user)
+        return render(request, 'friends.html', {'users':users, 'friends':friends, 'sent_requests':sent_friend_requests, 'received_requests':recieved_friend_requests})
+    else:
+        return redirect('login')
+
+def send_friend_request(request, userID):
+    new_friend = ExtendedUser.objects.get(id=userID)
+    friend_request = FriendRequest.objects.get_or_create(sent_from=request.user, sent_to=new_friend)
+    notification = Notification.objects.get_or_create(message="Friend request: " + request.user.username, user=ExtendedUser.objects.get(id=userID))
+    return redirect('friends')
+
+def remove_friend_request(request, userID):
+    new_friend = ExtendedUser.objects.get(id=userID)
+    friend_request = FriendRequest.objects.get(sent_from=new_friend, sent_to=request.user)
+    friend_request.delete()
+    
+def deny_friend_request(request, userID):
+    remove_friend_request(request, userID)
+    return redirect('friends')
+
+def accept_friend_request(request, userID):
+    add_friend(request, userID)
+    remove_friend_request(request, userID)
+    return redirect('friends')
+
+def notification(request, notificationID):
+    notification = Notification.objects.get(id=notificationID)
+    notification.delete()
+    return redirect('friends')
+
+def friend_suggestion(request):
+    quizzes = {}
+    user_attempts = Attempt.objects.all().filter(user=request.user)
+    for attempt in user_attempts:
+        if attempt.completed:
+            quizzes[attempt.quiz] = attempt.completed
+    print(quizzes)
+    quiz = random.choice(list(quizzes.keys()))
+    other_attempts = Attempt.objects.all().filter(~Q(user=request.user))
+    other_users = []
+    for attempt in other_attempts:
+        other_users.append(attempt.user)
+    other_users = list(dict.fromkeys(other_users)) #remove duplicates
+    if len(other_users) > 0:
+        friend = random.choice(other_users)
+        notification = Notification.objects.get_or_create(message="Friend Suggestion: " + friend.username + " has completed the " + quiz.name + " quiz too!", user=request.user)
+    return redirect('pathways-home')
+
+def notification_socket(request):
+    if request.method == "GET":
+        notification = get_object_or_404(Notification, id = request.GET.get('notification'))
+        notification.delete()
+        return redirect('friends')
+    
+def shop(request):
+    if request.user.is_authenticated:
+        if request.method == 'POST':
+            user = request.user
+            requestType = request.POST.get('type')
+            requestId = request.POST.get('id')
+
+            if requestType == 'buy_avatar':
+                avatar = get_object_or_404(Avatar, id = requestId)
+
+                if user.points() >= avatar.cost:
+                    user.spentPoints += avatar.cost
+                    user.inventoryAvatar.add(avatar)
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'purchased ' + avatar.name + ' for ' + str(avatar.cost) + 
+                                          ' points!')
+                else:
+                    messages.add_message(request, messages.ERROR, 'You do not have enough' +
+                                           ' points for this item! Complete more quizzes to ' +
+                                           'earn more points.')
+            elif requestType == 'buy_decoration':
+                decoration = get_object_or_404(Decoration, id = requestId)
+                
+                if user.points() >= decoration.cost:
+                    user.spentPoints += decoration.cost
+                    user.inventoryDecoration.add(decoration)
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'purchased ' + decoration.name + ' for ' + str(decoration.cost) + 
+                                          ' points!')
+                else:
+                    messages.add_message(request, messages.ERROR, 'You do not have enough' +
+                                           ' points for this item! Complete more quizzes to ' +
+                                           'earn more points.')
+            elif requestType == 'equip_avatar':
+                avatar = get_object_or_404(Avatar, id = requestId)
+
+                if user.inventoryAvatar.all().filter(id = requestId).count() == 1:
+                    user.avatar = avatar
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'equipped ' + avatar.name)
+                else:
+                    messages.add_message(request, messages.ERROR, 'You are unable to equip this.')
+            elif requestType == 'equip_decoration':
+                decoration = get_object_or_404(Decoration, id = requestId)
+
+                if user.inventoryDecoration.all().filter(id = requestId).count() == 1:
+                    user.decoration = decoration
+                    user.save()
+
+                    messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
+                                          'equipped ' + decoration.name)
+                else:
+                    messages.add_message(request, messages.ERROR, 'You are unable to equip this.')
+
+        context = {}
+        context['points'] = request.user.points
+        context['equipped_avatar'] = request.user.avatar
+        context['equipped_decoration'] = request.user.decoration
+        context['owned_avatars'] = request.user.inventoryAvatar.all()
+        context['owned_decorations'] = request.user.inventoryDecoration.all()
+        context['avatars'] = Avatar.objects.exclude(id__in = context['owned_avatars'])
+        context['decorations'] = Decoration.objects.exclude(id__in = context['owned_decorations'])
+
+        return render(request, 'shop.html', context)
+    else:
+        messages.add_message(request, messages.ERROR, 'You need to be logged in')
+        return redirect('login')
+

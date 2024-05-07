@@ -2,9 +2,13 @@ import json
 import os
 
 from django.core.management.base import BaseCommand
+from django.core.files.images import ImageFile
+
 from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information
+from app_user.models import Avatar, Decoration
 
 
+# Define a custom management command for Django
 class Command(BaseCommand):
     """Django command to load data from JSON files into the Quiz model."""
 
@@ -52,6 +56,9 @@ class Command(BaseCommand):
         MultipleChoiceOptions.objects.all().delete()
         FillInBlank.objects.all().delete()
         FillInBlankSentence.objects.all().delete()
+        Information.objects.all().delete()
+        Avatar.objects.all().delete()
+        Decoration.objects.all().delete()
 
         # Seed data for each quiz
         self.seed_quiz_data(calc_tax_quiz_data)
@@ -72,6 +79,55 @@ class Command(BaseCommand):
 
         self.seed_quiz_data(save_money_quiz_data)
         self.stdout.write(self.style.SUCCESS('Data for Save Money Quiz loaded successfully!'))
+
+        # Seed all the profile avatars and decorations
+        avatar = Avatar(name = 'Cat',
+                        image = ImageFile(open('sample_data/icon-avatar-cat.png', 'rb'),
+                                        name='icon-avatar-cat.png'))
+        avatar.save()
+        avatar.full_clean()
+
+        avatar = Avatar(name = 'Dog',
+                        image = ImageFile(open('sample_data/icon-avatar-dog.png', 'rb'),
+                                        name='icon-avatar-dog.png'))
+        avatar.save()
+        avatar.full_clean()
+
+        avatar = Avatar(name = 'Duck',
+                        image = ImageFile(open('sample_data/icon-avatar-duck.png', 'rb'),
+                                        name='icon-avatar-duck.png'))
+        avatar.save()
+        avatar.full_clean()
+
+        avatar = Avatar(name = 'Lily',
+                        image = ImageFile(open('sample_data/icon-avatar-lily.png', 'rb'),
+                                        name='icon-avatar-lily.png'))
+        avatar.save()
+        avatar.full_clean()
+
+        avatar = Avatar(name = 'Snail',
+                        image = ImageFile(open('sample_data/icon-avatar-snail.png', 'rb'),
+                                        name='icon-avatar-snail.png'))
+        avatar.save()
+        avatar.full_clean()
+
+        decoration = Decoration(name = 'Crown',
+                                image = ImageFile(open('sample_data/icon-hat-crown.png', 'rb'),
+                                        name='icon-hat-crown.png'))
+        decoration.save()
+        decoration.full_clean()
+
+        decoration = Decoration(name = 'Propellor Hat',
+                                image = ImageFile(open('sample_data/icon-hat-propellor.png', 'rb'),
+                                        name='icon-hat-propellor.png'))
+        decoration.save()
+        decoration.full_clean()
+
+        decoration = Decoration(name = 'Wizard Hat',
+                                image = ImageFile(open('sample_data/icon-hat-wizard.png', 'rb'),
+                                        name='icon-hat-wizard.png'))
+        decoration.save()
+        decoration.full_clean()
 
     def seed_quiz_data(self, quiz_data):
         """Seeds data for a single quiz."""
@@ -133,3 +189,4 @@ class Command(BaseCommand):
                         quiz=quiz,
                         position=info_data['position']
                     )
+

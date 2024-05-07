@@ -2,12 +2,13 @@
 {% load i18n %}
 
 <div class="sidebar" id="sidebar">
-    <div class="logo-details">
+<div style="position: sticky; top: 0">
+        <div class="logo-details">
         {#        <i class='bx bxl-c-plus-plus icon'></i>   I cant to make it into the graduation icon instead#}
         <div class="logo_name">SterLearning</div>
         <i class='bx bx-menu ' id="btn"></i>
     </div>
-    <ul class="nav-list ">
+    <ul class="nav-list">
         <li>
             <i class='bx bx-search myIcon'></i>
             <input type="text" placeholder="Search...">
@@ -21,7 +22,7 @@
             <span class="tooltip">Home</span>
         </li>
         <li>
-            <a href="#">
+            <a href="{% url 'index' %}">
                 <i class='bx bx-user myIcon'></i>
                 <span class="links_name">Account</span>
             </a>
@@ -29,13 +30,13 @@
         </li>
         <li>
             <a href="#">
-                <i class='bx bxs-medal myIcon'></i>
-                <span class="links_name">Leaderboard</span>
+                <i class="bi bi-tools"></i>
+                <span class="links_name">Tools</span>
             </a>
-            <span class="tooltip">Leaderboard</span>
+            <span class="tooltip">Tools</span>
         </li>
         <li>
-            <a href="#">
+            <a href="{% url 'pathways-home' %}">
                 <i class='bx bx-edit myIcon'></i>
                 <span class="links_name">Tests</span>
             </a>
@@ -52,7 +53,8 @@
             </div>
             <i class='bx bx-log-out' id="log_out"></i>
         </li>
+        <li>{% include 'notification_button.html' %}</li>
     </ul>
 </div>
 
-{#<script src="{% static 'js/header.js' %}"></script>#}
+</div>

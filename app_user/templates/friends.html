@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+{% extends 'base.html' %}
+
+{%  block content %}
+<head>
+    <title>Test Page</title>
+    <script src="https://accounts.google.com/gsi/client" async></script>
+</head>
+<body>
+    <h2>Friends</h2>
+    <ul>
+    {% for user in friends %}
+        <li>{{ user.username }}</li>
+        <a href="{% url 'remove-friend' user.id %}">Remove Friend</a>
+    {% endfor %}
+    </ul>
+    <h2>Friend Requests</h2>
+    <ul>
+        <li>Sent:</li>
+        <ul>
+        {% for request in sent_requests %}
+            <li>{{ request.sent_to.username }}</li>
+        {% endfor %}
+        </ul>
+        <li>Received:</li>
+        <ul>
+        {% for request in received_requests %}
+            <li>{{ request.sent_from.username }}</li>
+            <a href="{% url 'accept-friend-request' request.sent_from.id %}">Add Friend</a>
+            <a href="{% url 'deny-friend-request' request.sent_from.id %}">Deny Request</a>
+        {% endfor %}
+        </ul>
+    </ul>
+    <h2>Other Users</h2>
+    <ul>
+    {% for user in users %}
+        {% if user != request.user %}
+            {% if user not in friends %}
+                <li>{{ user.username }}</li>
+                <a href="{% url 'send-friend-request' user.id %}">Send Friend Request</a>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+    </ul>
+</body>
+{% endblock %}
