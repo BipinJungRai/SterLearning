@@ -18,7 +18,10 @@ from django.contrib import messages
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    if request.user.is_authenticated:
+        return redirect('pathways-home')
+    else:
+        return redirect('login')
 
 def user_signup(request):
     if request.method == 'POST':
