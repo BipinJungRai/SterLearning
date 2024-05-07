@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import index, AuthGoogle, changeUsername, user_signup, user_login, user_logout, user_settings
+from .views import *
 
 urlpatterns = [
     path("", index, name="index"),
@@ -9,4 +9,13 @@ urlpatterns = [
     path("login", user_login, name="login"),
     path("logout", user_logout, name="logout"),
     path("settings", user_settings, name="settings"),
+    path("tools", user_tools, name="tools"),
+    path("send_friend_request/<int:userID>/", send_friend_request, name="send-friend-request"),
+    path("remove_friend/<int:userID>/", remove_friend, name="remove-friend"),
+    path("friends", user_friends, name="friends"),
+    path("deny_friend_request/<int:userID>/", deny_friend_request, name="deny-friend-request"),
+    path("accept_friend_request/<int:userID>/", accept_friend_request, name="accept-friend-request"),
+    path("notification/<int:notificationID>/", notification, name="notification"),
+    path("friend_suggestion/", friend_suggestion, name="friend-suggestion"),
+    path("notification_socket", notification_socket, name="notification-socket"),
 ]

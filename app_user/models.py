@@ -5,6 +5,7 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
+from datetime import datetime
 
 class Decoration(models.Model):
     name = models.CharField(max_length=128)
@@ -49,3 +50,32 @@ class PointsAwarded(models.Model):
     points = models.IntegerField()
     time = models.DateTimeField(auto_now_add = True)
 
+class Friend(models.Model):
+    users = models.ManyToManyField(ExtendedUser)
+    current_user = models.ForeignKey(ExtendedUser, related_name='owner', null=True, on_delete= models.CASCADE)
+
+    @classmethod
+    def make_friend(cls, current_user, new_friend):
+        friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        friend.users.add(new_friend)
+
+    @classmethod
+    def remove_friend(cls, current_user, new_friend):
+        friend, created = cls.objects.get_or_create(
+            current_user=current_user
+        )
+        friend.users.remove(new_friend)
+
+class FriendRequest(models.Model):
+    # store the user that has sent the request
+    sent_from = models.ForeignKey(ExtendedUser, related_name="requests_sent", on_delete= models.CASCADE)
+    # store the user that has received the request
+    sent_to = models.ForeignKey(ExtendedUser, related_name="requests_received", on_delete= models.CASCADE)
+
+class Notification(models.Model):
+    is_read = models.BooleanField(default=False)
+    message = models.CharField(max_length=100)
+    user = models.ForeignKey(ExtendedUser, on_delete=models.CASCADE)
+    date_created = models.DateTimeField(default=datetime.now)

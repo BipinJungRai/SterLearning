@@ -22,7 +22,7 @@
             <span class="tooltip">Home</span>
         </li>
         <li>
-            <a href="#">
+            <a href="{% url 'index' %}">
                 <i class='bx bx-user myIcon'></i>
                 <span class="links_name">Account</span>
             </a>
@@ -36,7 +36,7 @@
             <span class="tooltip">Tools</span>
         </li>
         <li>
-            <a href="#">
+            <a href="{% url 'pathways-home' %}">
                 <i class='bx bx-edit myIcon'></i>
                 <span class="links_name">Tests</span>
             </a>
@@ -53,6 +53,7 @@
             </div>
             <i class='bx bx-log-out' id="log_out"></i>
         </li>
+        <li>{% include 'notification_button.html' %}</li>
     </ul>
 </div>
 
