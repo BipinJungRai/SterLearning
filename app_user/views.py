@@ -17,6 +17,7 @@ from django.contrib.auth.decorators import login_required
 from app_quiz.models import Attempt
 import random
 from django.db.models import Q
+from django.shortcuts import get_object_or_404
 
 # Create your views here.
 def index(request):
@@ -179,7 +180,8 @@ def friend_suggestion(request):
     return redirect('pathways-home')
 
 def notification_socket(request):
-    latest = Notification.objects.latest("date_created")
-    latest.delete()
-    return redirect('friends')
+    if request.method == "GET":
+        notification = get_object_or_404(Notification, id = request.GET.get('notification'))
+        notification.delete()
+        return redirect('friends')
     

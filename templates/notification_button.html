@@ -51,13 +51,27 @@
         var newLi = document.createElement('li');
 
         // Create a new anchor element
-        var newAnchor = document.createElement('a');
-        newAnchor.className = 'dropdown-item text-wrap';
-        newAnchor.href = "{% url 'notification-socket' %}";
+        var newForm = document.createElement('form');
+        newForm.className = 'dropdown-item text-wrap';
+        newForm.method = "GET";
+        newForm.action = "{% url 'notification-socket' %}";
+        
+
+        var newInput = document.createElement('input');
+        newInput.type = "hidden";
+        newInput.name = "notification";
+        newInput.value = id;
+
+        var newAnchor = document.createElement('button');
+        newAnchor.type = "submit";
+        newAnchor.class="dropdown-item text-wrap"
         newAnchor.textContent = message;
 
+        newForm.appendChild(newInput);
+        newForm.append(newAnchor);
+
         // Append the anchor element to the li element
-        newLi.appendChild(newAnchor);
+        newLi.appendChild(newForm);
 
         // Get the ul element with the id "notify"
         var ulElement = document.getElementById('notify');
