@@ -25,6 +25,9 @@ class Command(BaseCommand):
         budget_paycheck_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/budget_paycheck_data.json')
         rent_bills_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/rent_bills_data.json')
         save_money_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/save_money_data.json')
+        retiring_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/retiring_data.json')
+        state_workplace_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/state_workplace_data.json')
+        what_is_pension_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/what_is_pension_data.json')
 
         # Load Calculating Taxes Quiz data
         with open(calc_tax_quiz_json, 'r') as f:
@@ -49,6 +52,18 @@ class Command(BaseCommand):
         # Load Save Money Quiz data
         with open(save_money_quiz_json, 'r') as f:
             save_money_quiz_data = json.load(f)
+
+        # Load Retiring Quiz data
+        with open(retiring_quiz_json, 'r') as f:
+            retiring_quiz_json = json.load(f)
+
+        # Load State Workplace Quiz data
+        with open(state_workplace_quiz_json, 'r') as f:
+            state_workplace_quiz_json = json.load(f)
+
+        # Load What is a Pension Quiz data
+        with open(what_is_pension_quiz_json, 'r') as f:
+            what_is_pension_quiz_json = json.load(f)
 
         # Delete existing data
         Quiz.objects.all().delete()
@@ -79,6 +94,15 @@ class Command(BaseCommand):
 
         self.seed_quiz_data(save_money_quiz_data)
         self.stdout.write(self.style.SUCCESS('Data for Save Money Quiz loaded successfully!'))
+
+        self.seed_quiz_data(retiring_quiz_json)
+        self.stdout.write(self.style.SUCCESS('Data for Retiring Quiz loaded successfully!'))
+
+        self.seed_quiz_data(state_workplace_quiz_json)
+        self.stdout.write(self.style.SUCCESS('Data for State Workplace Quiz loaded successfully!'))
+
+        self.seed_quiz_data(what_is_pension_quiz_json)
+        self.stdout.write(self.style.SUCCESS('Data for What is a Pension Quiz loaded successfully!'))
 
         # Seed all the profile avatars and decorations
         avatar = Avatar(name = 'Cat',

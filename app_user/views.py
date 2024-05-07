@@ -24,7 +24,7 @@ from django.contrib import messages
 # Create your views here.
 def index(request):
     if request.user.is_authenticated:
-        return redirect('pathways-home')
+        return render(request, 'index.html')
     else:
         return redirect('login')
 
