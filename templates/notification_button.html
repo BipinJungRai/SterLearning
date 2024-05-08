@@ -2,13 +2,15 @@
 {% load i18n %}
 
 {% if user.is_authenticated %}
-
+<!--https://medium.com/@devsumitg/revolutionize-your-user-experience-creating-real-time-notifications-with-django-channels-18053b958fb6-->
 <div class="dropdown">
     <a href="#" data-bs-toggle="dropdown">
     {% if notifications|length == 0 %}
     <i id="bellCount" class ="fa-solid fa-bell" data-count="0" ></i>
+    <span class="links_name">Notifications</span>
     {% else %}
     <i id="bellCount" class="fa-solid fa-bell" data-count={{notifications|length}} ></i>
+    <span class="links_name">Notifications</span>
     {% endif %}
     </a>
     <ul class="dropdown-menu dropdown-menu-dark  text-wrap" id="notify" style="width: 30px !important;">
