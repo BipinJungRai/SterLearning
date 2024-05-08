@@ -31,6 +31,7 @@ def index(request):
 def user_signup(request):
     if request.method == 'POST':
         form = UserCreationWithEmailForm(request.POST)
+        print(form['username'].value())
         if form.is_valid():
             form.save()
             return redirect('login')
@@ -95,7 +96,7 @@ def user_login(request):
             password = form.cleaned_data['password']
             user = authenticate(request, username=username, password=password)
             if user:
-                login(request, user)    
+                login(request, user)
                 return redirect('index')
     else:
         form = LoginForm()

@@ -30,39 +30,39 @@ class Command(BaseCommand):
         what_is_pension_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/what_is_pension_data.json')
 
         # Load Calculating Taxes Quiz data
-        with open(calc_tax_quiz_json, 'r') as f:
+        with open(calc_tax_quiz_json, 'r', encoding='utf8') as f:
             calc_tax_quiz_data = json.load(f)
 
         # Load Payslip Reading Quiz data
-        with open(payslip_reading_quiz_json, 'r') as f:
+        with open(payslip_reading_quiz_json, 'r', encoding='utf8') as f:
             payslip_reading_quiz_data = json.load(f)
 
         # Load Differences in Part-time and Full-time Pay Quiz data
-        with open(diff_in_partfull_quiz_json, 'r') as f:
+        with open(diff_in_partfull_quiz_json, 'r', encoding='utf8') as f:
             diff_in_partfull_quiz_data = json.load(f)
 
         # Load Budget Paycheck Quiz data
-        with open(budget_paycheck_quiz_json, 'r') as f:
+        with open(budget_paycheck_quiz_json, 'r', encoding='utf8') as f:
             budget_paycheck_quiz_data = json.load(f)
 
         # Load Rent Bills Quiz data
-        with open(rent_bills_quiz_json, 'r') as f:
+        with open(rent_bills_quiz_json, 'r', encoding='utf8') as f:
             rent_bills_quiz_data = json.load(f)
 
         # Load Save Money Quiz data
-        with open(save_money_quiz_json, 'r') as f:
+        with open(save_money_quiz_json, 'r', encoding='utf8') as f:
             save_money_quiz_data = json.load(f)
 
         # Load Retiring Quiz data
-        with open(retiring_quiz_json, 'r') as f:
+        with open(retiring_quiz_json, 'r', encoding='utf8') as f:
             retiring_quiz_json = json.load(f)
 
         # Load State Workplace Quiz data
-        with open(state_workplace_quiz_json, 'r') as f:
+        with open(state_workplace_quiz_json, 'r', encoding='utf8') as f:
             state_workplace_quiz_json = json.load(f)
 
         # Load What is a Pension Quiz data
-        with open(what_is_pension_quiz_json, 'r') as f:
+        with open(what_is_pension_quiz_json, 'r', encoding='utf8') as f:
             what_is_pension_quiz_json = json.load(f)
 
         # Delete existing data
@@ -134,6 +134,10 @@ class Command(BaseCommand):
                                         name='icon-avatar-snail.png'))
         avatar.save()
         avatar.full_clean()
+
+        avatar = Avatar(name = 'Default',
+                        image = ImageFile(open('sample_data/Placeholder image.png', 'rb'),
+                                          name='Placeholder image.png'))
 
         decoration = Decoration(name = 'Crown',
                                 image = ImageFile(open('sample_data/icon-hat-crown.png', 'rb'),

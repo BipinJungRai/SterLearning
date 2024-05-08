@@ -49,10 +49,14 @@
             </a>
             <span class="tooltip">Shop</span>
         </li>
-
+        {% if user.is_authenticated %}
         <li class="profile">
             <div class="profile-details ">
-                <img src="{{user.avatar.image.url}}" alt="profileImg">
+                {% if user.avatar %}
+                    <img src="{{user.avatar.image.url}}" alt="profileImg">
+                {% else %}
+                    <img src="{% static 'person-fill.svg' %}" alt="profileImg" style="filter: invert()">
+                {% endif %}
                 <div class="name_job">
                     <div class="name">{{ user.username }}</div>
                     <div class="job">Student</div>
@@ -63,6 +67,7 @@
             </a>
         </li>
         <li>{% include 'notification_button.html' %}</li>
+        {% endif %}
     </ul>
 </div>
 
