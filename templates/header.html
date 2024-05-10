@@ -52,11 +52,17 @@
         {% if user.is_authenticated %}
         <li class="profile">
             <div class="profile-details ">
-                {% if user.avatar %}
-                    <img src="{{user.avatar.image.url}}" alt="profileImg">
-                {% else %}
-                    <img src="{% static 'person-fill.svg' %}" alt="profileImg" style="filter: invert()">
-                {% endif %}
+                <div class="parent" style="position: relative; top: 0; left: 0;">
+                    {% if user.avatar %}
+                        <img class = "image1" src="{{user.avatar.image.url}}" alt="profileImg" style="position: relative; top: 0; left: 0;">
+                        {% if user.decoration %}
+                            <img class = "image2" src="{{user.decoration.image.url}}" alt="profileImg" style="position: absolute; top: 0px; left: 0px;">
+                        {% endif %}
+                        
+                    {% else %}
+                        <img src="{% static 'person-fill.svg' %}" alt="profileImg" style="filter: invert()">
+                    {% endif %}
+                </div>
                 <div class="name_job">
                     <div class="name">{{ user.username }}</div>
                     <div class="job">Student</div>
