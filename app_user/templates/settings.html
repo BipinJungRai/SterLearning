@@ -1,5 +1,9 @@
 <!DOCTYPE html>
-<html>
+{% extends 'base.html' %}
+{% load static %}
+{% load i18n %}
+
+{%  block content %}
 <head>
     <title>Settings Page</title>
 </head>
@@ -10,4 +14,5 @@
         <button>Change Username</button>
     </a>
 </body>
-</html>
+
+{% endblock %}
