@@ -52,3 +52,17 @@ img.circle {
     -webkit-transform: scale(1.1);
     opacity: 1;
 }
+
+.wrapper-pathways {
+    display: grid;
+    /* border-color: red; 
+    border-style: solid; */
+    grid-gap: 10px;
+    width: 70%;
+    height: 90vh;
+    z-index: -50;
+    transform: translate(100px);
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+
+}
