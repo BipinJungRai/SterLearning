@@ -232,4 +232,4 @@ class NotificationConsumer(AsyncWebsocketConsumer):
         )
 
     async def send_notification(self, event):
-        await self.send(text_data=json.dumps({ 'message': event['message'] , 'id' : event['id'] }))
+        await self.send(text_data=json.dumps({ 'message': event['message'] , 'id' : event['id'], 'target' : event['target'] }))

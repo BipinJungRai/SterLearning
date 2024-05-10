@@ -13,6 +13,7 @@ def notification_created(sender, instance, created, **kwargs):
             {
                 "type": "send_notification",
                 "message": instance.message,
-                "id" : instance.id
+                "id" : instance.id,
+                "target" : instance.user.id
             }
         )
