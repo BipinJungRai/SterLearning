@@ -66,6 +66,27 @@ footer {
     color: #FFFCFC;
     text-align: center;
 }
-.list-group-custom .list-group-item:hover {
-    background-color: red;
-  }
+
+.list-group-item-custom .list-group-item:hover {
+    background-color: #FFFCFC;
+    color: #11101D;
+}
+
+.list-group-item-custom li:first-child{
+    background-color: #11101D;
+    border-bottom: 1px solid #FFFCFC;
+    border-left-color: #11101D;
+    border-right-color: #11101D;
+    border-top-color: #11101D;
+    color: #FFFCFC;
+    text-align: center;
+}
+.list-group-item-custom li:first-child:hover{
+    background-color: #11101D;
+    border-bottom: 1px solid #FFFCFC;
+    border-left-color: #11101D;
+    border-right-color: #11101D;
+    border-top-color: #11101D;
+    color: #FFFCFC;
+    text-align: center;
+}
