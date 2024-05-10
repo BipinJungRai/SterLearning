@@ -4,7 +4,6 @@ from django.http import HttpResponseRedirect
 from django.test import TestCase, Client, RequestFactory
 from django.urls import reverse
 from django import forms
-
 from app_quiz.models import Attempt, Quiz
 from .context_processors import notification_list
 from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
@@ -14,7 +13,6 @@ from django.core.files.images import ImageFile
 from unittest.mock import patch
 from django.contrib.auth import get_user_model
 
-from .views import user_login
 
 # Sample data located om sample_data folder
 # Includes a placeholder image

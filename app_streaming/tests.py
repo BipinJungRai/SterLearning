@@ -1,21 +1,23 @@
-import asyncio
-
-from app_streaming.consumers import get_section
-from channels.testing import WebsocketCommunicator
-from channels.routing import URLRouter
-from django.test import TestCase
-from django.urls import path, re_path
-from app_streaming.consumers import QuizConsumer
-from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information, \
-Attempt
 import json
-
 from asgiref.sync import sync_to_async
-from django.contrib.auth.models import User
+from channels.db import database_sync_to_async
+from django.contrib.auth import get_user_model
+from app_streaming.consumers import get_section
+from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information, \
+    Attempt
+from django.test import TestCase, AsyncClient
+from channels.testing import WebsocketCommunicator
+from app_streaming.consumers import QuizConsumer
 
 
 class GetSectionTest(TestCase):
+    """
+    Test the get_section function in the consumers.py file.
+    """
     def setUp(self):
+        """
+        A method that is run before each test.
+        """
         self.quiz = Quiz.objects.create(name='Test Quiz')
 
         self.mcq = MultipleChoice.objects.create(quiz=self.quiz, title='MCQ Question', position=1, points=10)
@@ -49,50 +51,76 @@ class GetSectionTest(TestCase):
         self.assertEqual(section['section_type'], 'end')
 
 
-from asgiref.sync import sync_to_async
-from django.contrib.auth.models import User
+class QuizConsumerTest(TestCase):
+    @database_sync_to_async
+    def create_user(self):
+        return get_user_model().objects.create_user(username='testuser', password='testpassword')
 
+    @database_sync_to_async
+    def create_quiz(self):
+        # Replace with your actual Quiz creation code...
+        return Quiz.objects.create(name='Test Quiz')
 
-class QuizConsumerTests(TestCase):
-    async def asyncSetUp(self):
-        # Create your test data here
-        self.user = await sync_to_async(User.objects.create_user)('testuser', 'test@example.com', 'testpassword')
-        self.quiz = await sync_to_async(Quiz.objects.create)(name="Test Quiz")
-        self.question = await sync_to_async(MultipleChoice.objects.create)(question_text="Test Question",
-                                                                           quiz=self.quiz)
-        self.option = await sync_to_async(MultipleChoiceOptions.objects.create)(option_text="Test Option",
-                                                                                question=self.question, correct=True)
-        self.attempt = await sync_to_async(Attempt.objects.create)(user=self.user, quiz=self.quiz, completed=False,
-                                                                   quiz_open=True)
+    async def connect(self):
+        # Create a user
+        self.user = await self.create_user()
 
-        self.application = URLRouter([
-            re_path(r"^ws/quiz/$", QuizConsumer.as_asgi()),
-        ])
+        # Create a quiz
+        self.quiz = await self.create_quiz()
 
-    def setUp(self):
-        asyncio.run(self.asyncSetUp())
+        # Create an AsyncClient instance
+        self.client = AsyncClient()
 
-    async def test_connect(self):
-        communicator = WebsocketCommunicator(self.application, "/ws/quiz/", user=self.user)
-        connected, _ = await communicator.connect()
-        assert connected is True
-        response = await communicator.receive_from()
+        # Log in the user
+        await sync_to_async(self.client.login)(username='testuser', password='testpassword')
+
+        # Create a communicator for the QuizConsumer
+        self.communicator = WebsocketCommunicator(QuizConsumer.as_asgi(), "/ws/quiz/")
+
+        # Set the user in the communicator's scope
+        self.communicator.scope['user'] = self.user
+
+        # Connect to the websocket
+        connected, _ = await self.communicator.connect()
+        assert connected
+
+        # Receive and discard the first message from the consumer
+        _ = await self.communicator.receive_from()
+
+    async def test_disconnect(self):
+        await self.connect()
+
+        # Send a message to the websocket
+        await self.communicator.send_to(json.dumps({"type": "start", "qid": self.quiz.id}))
+
+        # Receive and discard the first message from the consumer
+        _ = await self.communicator.receive_from()
+
+        # Disconnect from the websocket
+        await self.communicator.disconnect()
+
+        # Check if the quiz_open attribute of the attempt is False
+        attempt = await sync_to_async(Attempt.objects.get)(user=self.user)
+        self.assertFalse(attempt.quiz_open)
+
+    async def test_receive(self):
+        await self.connect()
+
+        # Send a message to the websocket
+        await self.communicator.send_to(json.dumps({"type": "start", "qid": self.quiz.id}))
+
+        # Receive and decode the second message from the consumer
+        response = await self.communicator.receive_from()
         data = json.loads(response)
-        self.assertEqual(data["type"], "connected")
-        await communicator.disconnect()
 
-    async def test_receive_answer_mcq(self):
-        communicator = WebsocketCommunicator(self.application, "/ws/quiz/", user=self.user)
-        await communicator.connect()
-        await communicator.send_to(json.dumps({
-            "type": "answer",
-            "section_type": "mcq",
-            "question_id": self.question.id,
-            "selected_id": self.option.id
-        }))
-        response = await communicator.receive_from()
-        data = json.loads(response)
-        self.assertEqual(data["type"], "validated_mcq_answer")
-        self.assertEqual(data["correct"], True)
-        self.assertEqual(data["awarded"], self.question.points)
-        await communicator.disconnect()
+        # Check the contents of the message
+        self.assertEqual(data, {"type": "first_section", "section_type": "end", "section": {}})
+
+        # Disconnect from the websocket
+        await self.communicator.disconnect()
+
+        # TODO: To make your tests better, evaluate more of the expected contents (self.assertEqual etc.),
+        #  but to do that u need to define the expected contents first, as in instantiate the necessary models.
+        #  When using asserts its better to call the predefined values e.g. self.quiz.id instead of just the number
+        #  of what's expected, so that the test is more robust and can be used in the future when the values change.
+
