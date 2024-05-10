@@ -4,29 +4,33 @@
 {% load i18n %}
 
 {%  block content %}
-    <title>Test Page</title>
+<head>
+    <title>Account Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'accountpage.css' %}">
     <script src="https://accounts.google.com/gsi/client" async></script>
 </head>
 
 
 <body>
-    <div class="wrapper-acc">
-        <div class="active-area">
-            <div id="active-area-list">
-                <ul class="list-group list-group-flush">
+    <div class="container">
+        <div class="wrapper">
+
+                <div class="list-group list-group-item-custom">
 
                 {% if user.is_authenticated %}
                     <div id="accImage">
                             {% if user.avatar %}
-                                <li class="list-group-item"><img src="{{user.avatar.image.url}}" alt="profileImg">
+                                <li class="list-group-item list-group-item-dark"><img src="{{user.avatar.image.url}}" alt="profileImg">
                             {% else %}
-                                <li class="list-group-item"><img src="{% static 'person-fill.svg' %}" alt="profileImg" style="filter: invert()">
+                                <li class="list-group-item list-group-item-dark"><img src="{% static 'person-fill.svg' %}" alt="profileImg" style="filter: invert()">
                             {% endif %}
                         {{user.username}}</li>
                     </div>
-                    <li class="list-group-item"> <a href="{% url 'logout' %} " class="list-group-item list-group-item-action">Logout</a> </li>
-                    <li class="list-group-item"> <a href="{% url 'friends' %}" class="list-group-item list-group-item-action">Friends</a></li>
-                    <li class="list-group-item"> <a href="{% url 'settings' %}" class="list-group-item list-group-item-action" >Settings</a></li>
+                    <a class="list-group-item" href="{% url 'logout' %} " class="list-group-item list-group-item-action">Logout</a> </li>
+                    <a class="list-group-item" href="{% url 'friends' %}" class="list-group-item list-group-item-action">Friends</a></li>
+                    <a class="list-group-item" href="{% url 'settings' %}" class="list-group-item list-group-item-action" >Settings</a></li>
         
                 {% else %}
                     <li> <a href="{% url 'login' %}">Login</a> </li>
@@ -48,9 +52,9 @@
                         data-logo_alignment="left">
                     </div>
                 {% endif%}
-            </ul>
+                </div>
         </div>
-        </div>
+
     </div>
 </body>
 {% endblock %}
