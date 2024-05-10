@@ -28,10 +28,10 @@
                             {% endif %}
                         {{user.username}}</li>
                     </div>
-                    <a class="list-group-item" href="{% url 'logout' %} " class="list-group-item list-group-item-action">Logout</a> </li>
                     <a class="list-group-item" href="{% url 'friends' %}" class="list-group-item list-group-item-action">Friends</a></li>
                     <a class="list-group-item" href="{% url 'settings' %}" class="list-group-item list-group-item-action" >Settings</a></li>
-        
+                    <a class="list-group-item" href="{% url 'logout' %} " class="list-group-item list-group-item-action">Logout</a> </li>
+                    
                 {% else %}
                     <li> <a href="{% url 'login' %}">Login</a> </li>
                     <li> <a href="{% url 'signup-user' %}">Signup</a> </li>
