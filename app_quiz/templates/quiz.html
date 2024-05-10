@@ -185,7 +185,7 @@
                                 quizSocket.send(JSON.stringify({
                                     'type': 'answer',
                                     'section_type': 'mcq',
-                                    'question_id': {{quiz.id}},
+                                    'question_id': data.section.sid,
                                     'selected_id': answer.options
                                 }))
                             // }
