@@ -1,0 +1,42 @@
+.wrapper-acc {
+    display: grid;
+    /* border-color: red; 
+    border-style: solid; */
+    grid-gap: 10px;
+    width: 70%;
+    height: 90vh;
+    z-index: -50;
+    transform: translate(100px);
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+
+}
+
+#accImage img{
+    height: 105px;
+    width: 105px;
+    object-fit: cover;
+    border-radius: 6px;
+    margin-right: 10px;
+}
+
+.wrapper-acc .active-area{
+    display: grid;
+    z-index: 0;
+    grid-template-columns: repeat(20, 1fr);
+    grid-template-rows: repeat(20, 1fr);
+    border-style: solid;
+    border-radius: 12px;
+    border-width: 1px;
+    
+    border-color: #53687E;
+    grid-column: 5 / span 10;
+    grid-row: 2 / span 18;
+    background-color: #FFFCFC;
+}
+
+#username-title{
+    grid-column: 2 / span 19;
+    grid-row: 2 / span 18;
+
+}
