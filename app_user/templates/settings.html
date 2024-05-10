@@ -6,13 +6,19 @@
 {%  block content %}
 <head>
     <title>Settings Page</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" type="text/css" href="{% static 'accountpage.css' %}">
 </head>
 <body>
-    <a href="{% url 'index' %}"><- Return to Account Page</a>
-    <h1>Profile Settings:</h1>
-    <a href="{% url 'change-username' %}">
-        <button>Change Username</button>
-    </a>
+    <div class="container">
+        <div class="wrapper">
+            <h1>Profile Settings:</h1>
+            <div class="list-group list-group-item-custom">
+                <a class="list-group-item" href="{% url 'change-username' %}">Change Username</a>
+            </div>
+        </div>
+    </div>
 </body>
 
 {% endblock %}
