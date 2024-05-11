@@ -54,7 +54,8 @@ class AuthGoogle(APIView):
                 email=user_email
             )
         except ObjectDoesNotExist:
-            password = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=20))
+            password = ''.join(random.choices(string.ascii_lowercase +
+                                              string.ascii_uppercase + string.digits, k=20))
             user = ExtendedUser.objects.create(
                 username=user_email,
                 email=user_email,
