@@ -23,7 +23,7 @@ class MortgageFormTest(TestCase):
             'loan_amount': 100000.0,
             'home_value': 150000.0,
             'downpayment': 50000.0,
-            # 'interest_rate': 3.5,  # This field is required but not provided
+            # 'interest_rate': 3.5,  # missing interest rate
             'duration_years': 30,
             'monthly_hoa': 100.0,
             'annual_property_tax': 2000.0,

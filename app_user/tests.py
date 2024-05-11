@@ -107,7 +107,7 @@ class ExtendedUserTests(TestCase):
                          1)
 
 
-# models
+
 class ExtendedUserModelTest(TestCase):
     def test_create_and_retrieve_user(self):
         ExtendedUser.objects.create(username='testuser', email='testuser@test.com')
@@ -392,45 +392,6 @@ class UserSettingsTest(TestCase):
         self.assertTemplateUsed(response, 'settings.html')
 
 
-# class UserToolsTest(TestCase):
-# #     def setUp(self):
-# #         self.client = Client()
-# #         self.user_model = get_user_model()
-# #         self.test_user = self.user_model.objects.create_user(username='testuser', password='testpassword')
-# #
-# #     def test_user_tools(self):
-# #         # Log the user in
-# #         self.client.login(username='testuser', password='testpassword')
-# #
-# #         # Call the user_tools view
-# #         response = self.client.get(reverse('tools'))
-# #
-# #         # Check that the response status is 200 (HTTP OK)
-# #         self.assertEqual(response.status_code, 200)
-
-
-# class AddFriendTest(TestCase):
-#     def setUp(self):
-#         self.client = Client()
-#         self.user_model = get_user_model()
-#         self.user1 = self.user_model.objects.create_user(username='testuser1', password='testpassword1')
-#         self.user2 = self.user_model.objects.create_user(username='testuser2', password='testpassword2')
-#
-#     def test_add_friend(self):
-#         # Log in as user1
-#         self.client.login(username='testuser1', password='testpassword1')
-#
-#         # Call the add_friend view
-#         self.client.get(reverse('add_friend', args=[self.user2.id]))
-#
-#         # Check that user2 is now a friend of user1
-#         friend = Friend.objects.get(current_user=self.user1)
-#         self.assertIn(self.user2, friend.users.all())
-#
-#         # Check that user1 is now a friend of user2
-#         friend = Friend.objects.get(current_user=self.user2)
-#         self.assertIn(self.user1, friend.users.all())
-
 class RemoveFriendTest(TestCase):
     def setUp(self):
         self.client = Client()
@@ -482,12 +443,6 @@ class FriendRequestTests(TestCase):
         self.assertEqual(response.status_code, 302)  # Expecting a redirect after successful request
         self.assertTrue(FriendRequest.objects.filter(sent_from=self.user1, sent_to=self.user2).exists())
 
-    # def test_remove_friend_request(self):
-    #     FriendRequest.objects.create(sent_from=self.user1, sent_to=self.user2)
-    #     self.client.login(username='user2', password='pass')
-    #     response = self.client.get(reverse('remove-friend', args=[self.user1.pk]))
-    #     self.assertEqual(response.status_code, 302)  # Expecting a redirect after successful removal
-    #     self.assertFalse(FriendRequest.objects.filter(sent_from=self.user1, sent_to=self.user2).exists())
 
     def test_deny_friend_request(self):
         FriendRequest.objects.create(sent_from=self.user1, sent_to=self.user2)

@@ -1,7 +1,5 @@
 from django.test import TestCase, Client
-from django.core.exceptions import ValidationError
 from django.urls import reverse
-
 from .models import *
 
 
@@ -255,34 +253,23 @@ class PathwaysViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.pathways_url = reverse(
-            'pathways-home')  # replace 'pathways' with the actual name of the url in your urls.py
+            'pathways-home')
 
     def test_pathways_GET(self):
         response = self.client.get(self.pathways_url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'pathways_home.html')  # replace with the actual template name
+        self.assertTemplateUsed(response, 'pathways_home.html')
 
-
-# class BankViewTest(TestCase):
-#     def setUp(self):
-#         self.client = Client()
-#         self.bank_url = reverse('bank-accounts')  # replace 'bank' with the actual name of the url in your urls.py
-#
-#     def test_bank_GET(self):
-#         response = self.client.get(self.bank_url)
-#
-#         self.assertEqual(response.status_code, 200)
-#         self.assertTemplateUsed(response, 'pathway.html')  # replace with the actual template name
 
 class QuizViewTest(TestCase):
     def setUp(self):
         self.client = Client()
         self.quiz = Quiz.objects.create(name='Test Quiz', description='A quiz for testing', pathway='LOANS')
-        self.quiz_url = reverse('quiz-views-quiz', args=[self.quiz.id])  # replace 'quiz-views-quiz' with the actual name of the url in your urls.py
+        self.quiz_url = reverse('quiz-views-quiz', args=[self.quiz.id])
 
     def test_quiz_GET(self):
         response = self.client.get(self.quiz_url)
 
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, 'quiz.html')  # replace with the actual template name
+        self.assertTemplateUsed(response, 'quiz.html')
