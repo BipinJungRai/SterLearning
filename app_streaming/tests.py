@@ -25,38 +25,46 @@ class GetSectionTest(TestCase):
 
         self.inf = Information.objects.create(quiz=self.quiz, title='Information', content='Content', position=3)
 
+    # Test retrieving a multiple choice section
     def test_get_section_mcq(self):
         section = get_section(self.quiz, 1)
         self.assertEqual(section['section_type'], 'mcq')
         self.assertEqual(section['section']['title'], self.mcq.title)
         self.assertEqual(len(section['section']['options']), 2)
 
+    # Test retrieving a fill in the blank section
     def test_get_section_fib(self):
         section = get_section(self.quiz, 2)
         self.assertEqual(section['section_type'], 'fib')
         self.assertEqual(section['section']['title'], self.fib.title)
         self.assertEqual(len(section['section']['sentences']), 1)
 
+    # Test retrieving an information section
     def test_get_section_inf(self):
         section = get_section(self.quiz, 3)
         self.assertEqual(section['section_type'], 'inf')
         self.assertEqual(section['section']['title'], self.inf.title)
 
+    # Test retrieving an end section
     def test_get_section_end(self):
         section = get_section(self.quiz, 4)
         self.assertEqual(section['section_type'], 'end')
 
 
 class QuizConsumerTest(TestCase):
+
+    # Create user asynchronously
     @database_sync_to_async
     def create_user(self):
         return get_user_model().objects.create_user(username='testuser', password='testpassword')
 
+    # Create quiz asynchronously
     @database_sync_to_async
     def create_quiz(self):
 
         return Quiz.objects.create(name='Test Quiz')
 
+    # Connect to the websocket
     async def connect(self):
 
         self.user = await self.create_user()
@@ -76,6 +84,7 @@ class QuizConsumerTest(TestCase):
 
         _ = await self.communicator.receive_from()
 
+    #  Test disconnecting from the websocket
     async def test_disconnect(self):
         await self.connect()
 
@@ -88,6 +97,7 @@ class QuizConsumerTest(TestCase):
         attempt = await sync_to_async(Attempt.objects.get)(user=self.user)
         self.assertFalse(attempt.quiz_open)
 
+    # Test retrieving data from websocket
     async def test_receive(self):
         await self.connect()
 

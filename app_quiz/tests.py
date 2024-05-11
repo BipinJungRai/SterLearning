@@ -201,6 +201,7 @@ class AttemptTest(TestCase):
         self.user = ExtendedUser.objects.create(username='testuser', password='testpassword')
         self.quiz = Quiz.objects.create(name='Test Quiz', description='A quiz for testing', pathway='LOANS')
 
+    # Test attempt creation
     def test_attempt_creation(self):
         attempt = Attempt.objects.create(user=self.user, quiz=self.quiz)
         self.assertEqual(Attempt.objects.count(), 1)
@@ -219,6 +220,7 @@ class MultipleChoiceResponseTest(TestCase):
         self.option = MultipleChoiceOptions.objects.create(text="Option A", correct=True, question=self.question)
         self.points_awarded = PointsAwarded.objects.create(user=self.user, points=10)
 
+    # Test multiple choice response creation
     def test_multiple_choice_response_creation(self):
         mc_response = MultipleChoiceResponse.objects.create(attempt=self.attempt, answer=self.option,
                                                             points_awarded=self.points_awarded)
@@ -239,6 +241,7 @@ class FillInBlankAnswerTest(TestCase):
         self.response = FillInBlankReponse.objects.create(attempt=self.attempt)
         self.points_awarded = PointsAwarded.objects.create(user=self.user, points=10)
 
+    # Test fill in blank answer creation
     def test_fill_in_blank_answer_creation(self):
         fib_answer = FillInBlankAnswer.objects.create(response=self.response, blank="Blank",
                                                       points_awarded=self.points_awarded, sentence=self.sentence)
@@ -255,6 +258,7 @@ class PathwaysViewTest(TestCase):
         self.pathways_url = reverse(
             'pathways-home')
 
+    # Test GET request for pathways view
     def test_pathways_GET(self):
         response = self.client.get(self.pathways_url)
 
@@ -268,6 +272,7 @@ class QuizViewTest(TestCase):
         self.quiz = Quiz.objects.create(name='Test Quiz', description='A quiz for testing', pathway='LOANS')
         self.quiz_url = reverse('quiz-views-quiz', args=[self.quiz.id])
 
+    # Test GET request for quiz view
     def test_quiz_GET(self):
         response = self.client.get(self.quiz_url)
 
