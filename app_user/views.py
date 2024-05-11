@@ -1,4 +1,5 @@
 import random
+import string
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from google.oauth2 import id_token
@@ -53,10 +54,12 @@ class AuthGoogle(APIView):
                 email=user_email
             )
         except ObjectDoesNotExist:
+            password = ''.join(random.choices(string.ascii_lowercase + string.ascii_uppercase + string.digits, k=20))
             user = ExtendedUser.objects.create(
                 username=user_email,
                 email=user_email,
                 first_name=user_data["given_name"],
+                password = password
                 )
             login(request, user)
             return redirect('change-username')

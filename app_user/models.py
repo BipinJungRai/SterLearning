@@ -85,6 +85,7 @@ class FriendRequest(models.Model):
     sent_to = models.ForeignKey(ExtendedUser,
                                 related_name="requests_received", on_delete= models.CASCADE)
 
+#https://medium.com/@devsumitg/revolutionize-your-user-experience-creating-real-time-notifications-with-django-channels-18053b958fb6#
 class Notification(models.Model):
     is_read = models.BooleanField(default=False)
     message = models.CharField(max_length=100)
