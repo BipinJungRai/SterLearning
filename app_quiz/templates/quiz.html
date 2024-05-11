@@ -258,17 +258,17 @@
 
                 //you have reached the end of the quiz! you have earned x points overall
                 let body = document.getElementById("body")
-                body.appendChild(document.createTextNode("congrats u have reached the end of the quiz\n"))
-                body.appendChild(document.createTextNode("you scored: " + points + " points \n"))
+                document.getElementById("marks").appendChild(document.createTextNode("congrats u have reached the end of the quiz\n"))
+                document.getElementById("marks").appendChild(document.createTextNode("you scored: " + points + " points \n"))
                 //and your accuracy was x%
                 let acc = (correct / answered) * 100
-                body.appendChild(document.createTextNode("with accuracy: " + Math.floor(acc) + "%\n"))
+                document.getElementById("marks").appendChild(document.createTextNode("with accuracy: " + Math.floor(acc) + "%\n"))
 
                 //return home?
                 let home = document.createElement("a")
                 home.setAttribute("href", "{% url 'friend-suggestion' %}")
                 home.appendChild(document.createTextNode("return home"))
-                body.appendChild(home)
+                document.getElementById("marks").appendChild(home)
             }
         }
 </script>
