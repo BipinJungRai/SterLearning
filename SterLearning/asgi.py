@@ -24,5 +24,4 @@ application = ProtocolTypeRouter({
                 app_streaming.routing.ws_urlpatterns
             )
         )
-    
 })

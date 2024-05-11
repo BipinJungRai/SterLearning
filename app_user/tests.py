@@ -1,28 +1,28 @@
-from django.test import TestCase
-from .models import ExtendedUser, Decoration, Avatar
 from pathlib import Path
+from django.test import TestCase
 from django.core.files.images import ImageFile
+from .models import ExtendedUser, Decoration, Avatar
 
 #Sample data located om sample_data folder
 #Includes a placeholder image
 ROOT_DIR = Path('sample_data')
-image_path = 'Placeholder image.png'
+IMAGE_PATH = 'Placeholder image.png'
 
 class DecorationTests(TestCase):
     @classmethod
     #Create a valid Decoration
     def setUpTestData(cls):
         d1 = Decoration(name='TestDecoration1',
-                        image=ImageFile(open(ROOT_DIR / image_path, 'rb'),
-                                        name=image_path))
+                        image=ImageFile(open(ROOT_DIR / IMAGE_PATH, 'rb'),
+                                        name=IMAGE_PATH))
         d1.save()
         d1.full_clean()
     #Test database records creation of new Decoration
     def test_save_decoration(self):
         db_count = Decoration.objects.all().count()
         decoration = Decoration(name='NewDecoration',
-                                image=ImageFile(open(ROOT_DIR / image_path, 'rb'),
-                                        name=image_path))
+                                image=ImageFile(open(ROOT_DIR / IMAGE_PATH, 'rb'),
+                                        name=IMAGE_PATH))
         decoration.save()
         decoration.full_clean()
         self.assertEqual(db_count+1, Decoration.objects.all().count())
@@ -31,18 +31,18 @@ class AvatarTests(TestCase):
     @classmethod
     def setUpTestData(cls):
         a1 = Avatar(name='TestAvatar1',
-                        image=ImageFile(open(ROOT_DIR / image_path, 'rb'),
-                                        name=image_path))
+                        image=ImageFile(open(ROOT_DIR / IMAGE_PATH, 'rb'),
+                                        name=IMAGE_PATH))
         a1.save()
         a1.full_clean()
 def test_save_avatar(self):
-        db_count = Avatar.objects.all().count()
-        avatar = Avatar(name='NewAvatar',
-                                image=ImageFile(open(ROOT_DIR / image_path, 'rb'),
-                                        name=image_path))
-        avatar.save()
-        avatar.full_clean()
-        self.assertEqual(db_count+1, Avatar.objects.all().count())
+    db_count = Avatar.objects.all().count()
+    avatar = Avatar(name='NewAvatar',
+                            image=ImageFile(open(ROOT_DIR / IMAGE_PATH, 'rb'),
+                                    name=IMAGE_PATH))
+    avatar.save()
+    avatar.full_clean()
+    self.assertEqual(db_count+1, Avatar.objects.all().count())
 
 class ExtendedUserTests(TestCase):
     @classmethod
@@ -56,8 +56,8 @@ class ExtendedUserTests(TestCase):
     #and inventory avatar filled
     def test_avatar_user(self):
         a1 = Avatar(name='NewAvatar',
-                        image=ImageFile(open(ROOT_DIR / image_path, 'rb'),
-                                        name=image_path))
+                        image=ImageFile(open(ROOT_DIR / IMAGE_PATH, 'rb'),
+                                        name=IMAGE_PATH))
         a1.save()
         a1.full_clean()
         user = ExtendedUser(username='NewExtendedUser',
@@ -73,8 +73,8 @@ class ExtendedUserTests(TestCase):
     #a user and added to inventory
     def test_decoration_user(self):
         d1 = Decoration(name='NewDecoration',
-                        image=ImageFile(open(ROOT_DIR / image_path, 'rb'),
-                                        name=image_path))
+                        image=ImageFile(open(ROOT_DIR / IMAGE_PATH, 'rb'),
+                                        name=IMAGE_PATH))
         d1.save()
         d1.full_clean()
         user = ExtendedUser(username='NewExtendedUser',
@@ -86,10 +86,3 @@ class ExtendedUserTests(TestCase):
         user.inventoryDecoration.add(d1)
         self.assertEqual(user.inventoryDecoration.all().count(),
                          1)
-
-
-
-
-
-        
-    

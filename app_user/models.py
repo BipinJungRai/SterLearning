@@ -1,11 +1,10 @@
 """ Models to extend the django user model,
     adding avatars and decorations
 """
-
+from datetime import datetime
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils.translation import gettext_lazy as _
-from datetime import datetime
 
 class Decoration(models.Model):
     name = models.CharField(max_length=128)
@@ -24,17 +23,26 @@ class Avatar(models.Model):
         return self.name
 
 class ExtendedUser(AbstractUser):
-    
-    avatar = models.ForeignKey(Avatar, null=True, blank=True, on_delete=models.SET_NULL, related_name='%(class)s_avatar_used') #User may not have an avatar to begin with, so can be null
-    decoration = models.ForeignKey(Decoration, blank=True, null=True, on_delete=models.SET_NULL, related_name='%(class)s_decoration_used') #User may not have a decoration to begin with, so can be null
-    email = models.EmailField(null=False, blank=False) #User must have an email to log in, so cannot be null
-    inventoryAvatar = models.ManyToManyField(Avatar, blank=True, related_name='%(class)s_avatars_stored') #Inventory starts empty, so can be blank
-    inventoryDecoration = models.ManyToManyField(Decoration, blank=True, related_name='%(class)s_decorations_stored') #Inventory starts empty, so can be blank
+
+    avatar = models.ForeignKey(Avatar, null=True, blank=True,
+                               on_delete=models.SET_NULL, related_name='%(class)s_avatar_used')
+    #User may not have an avatar to begin with, so can be null
+    decoration = models.ForeignKey(Decoration, blank=True, null=True, on_delete=models.SET_NULL,
+                                    related_name='%(class)s_decoration_used')
+    #User may not have a decoration to begin with, so can be null
+    email = models.EmailField(null=False, blank=False)
+    #User must have an email to log in, so cannot be null
+    inventoryAvatar = models.ManyToManyField(Avatar, blank=True,
+                                             related_name='%(class)s_avatars_stored')
+    #Inventory starts empty, so can be blank
+    inventoryDecoration = models.ManyToManyField(Decoration, blank=True,
+                                                 related_name='%(class)s_decorations_stored')
+    #Inventory starts empty, so can be blank
     spentPoints = models.IntegerField(default = 0)
 
     def __str__(self):
         return self.username
-    
+
     def points(self):
         points = PointsAwarded.objects.filter(user = self)
         total = 0
@@ -43,7 +51,7 @@ class ExtendedUser(AbstractUser):
             total += i.points
 
         return total - self.spentPoints
-    
+
 # Model to track when a user recieves points
 class PointsAwarded(models.Model):
     user = models.ForeignKey(ExtendedUser, on_delete = models.CASCADE)
@@ -52,7 +60,8 @@ class PointsAwarded(models.Model):
 
 class Friend(models.Model):
     users = models.ManyToManyField(ExtendedUser)
-    current_user = models.ForeignKey(ExtendedUser, related_name='owner', null=True, on_delete= models.CASCADE)
+    current_user = models.ForeignKey(ExtendedUser, related_name='owner',
+                                     null=True, on_delete= models.CASCADE)
 
     @classmethod
     def make_friend(cls, current_user, new_friend):
@@ -70,9 +79,11 @@ class Friend(models.Model):
 
 class FriendRequest(models.Model):
     # store the user that has sent the request
-    sent_from = models.ForeignKey(ExtendedUser, related_name="requests_sent", on_delete= models.CASCADE)
+    sent_from = models.ForeignKey(ExtendedUser,
+                                  related_name="requests_sent", on_delete= models.CASCADE)
     # store the user that has received the request
-    sent_to = models.ForeignKey(ExtendedUser, related_name="requests_received", on_delete= models.CASCADE)
+    sent_to = models.ForeignKey(ExtendedUser,
+                                related_name="requests_received", on_delete= models.CASCADE)
 
 class Notification(models.Model):
     is_read = models.BooleanField(default=False)

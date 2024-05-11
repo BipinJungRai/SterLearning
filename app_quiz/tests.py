@@ -10,7 +10,7 @@ def create_quiz():
              pathway = "LOANS")
     q.save()
     q.full_clean()
-    
+
     return q
 
 
@@ -34,7 +34,7 @@ class MultipleChoiceTest(TestCase):
 
         with self.assertRaises(ValidationError):
             q.full_clean()
-    
+
     # A question can't have 2 correct answers
     def test_one_correct_answer(self):
         quiz = create_quiz()
@@ -57,10 +57,10 @@ class MultipleChoiceTest(TestCase):
 
         with self.assertRaises(ValidationError):
             a.full_clean()
-        
+
         with self.assertRaises(ValidationError):
             b.full_clean()
-    
+
     # Test a valid question
     def test_valid(self):
         quiz = create_quiz()
@@ -105,7 +105,7 @@ class FillInBlankTest(TestCase):
 
         with self.assertRaises(ValidationError):
             q.full_clean()
-    
+
     # Test that sentence can't be empty
     def test_empty_sentence(self):
         quiz = create_quiz()
@@ -183,7 +183,7 @@ class InformationTest(TestCase):
 
         with self.assertRaises(ValidationError):
             i.full_clean()
-    
+
     # Test valid
     def test_valid(self):
         quiz = create_quiz()
