@@ -160,5 +160,3 @@ CHANNEL_LAYERS = {
 MESSAGE_TAGS = {
     messages.ERROR: "danger"
 }
-
-

@@ -51,8 +51,8 @@ def budget(request):
 
 
 def quiz(request, qid):
-    quiz = get_object_or_404(Quiz, id = qid)
+    current_quiz = get_object_or_404(Quiz, id = qid)
     context = {}
-    context["quiz"] = quiz
+    context["quiz"] = current_quiz
 
     return render(request, "quiz.html", context)

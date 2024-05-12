@@ -4,7 +4,8 @@ import os
 from django.core.management.base import BaseCommand
 from django.core.files.images import ImageFile
 
-from app_quiz.models import Quiz, MultipleChoice, MultipleChoiceOptions, FillInBlank, FillInBlankSentence, Information
+from app_quiz.models import (Quiz, MultipleChoice, MultipleChoiceOptions,
+    FillInBlank, FillInBlankSentence, Information)
 from app_user.models import Avatar, Decoration
 
 
@@ -19,15 +20,24 @@ class Command(BaseCommand):
 
         # Define the paths to the JSON files
         base_dir = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-        calc_tax_quiz_json = os.path.join(base_dir, 'json_pathways/tax_data/calc_tax_data.json')
-        payslip_reading_quiz_json = os.path.join(base_dir, 'json_pathways/tax_data/payslip_reading_data.json')
-        diff_in_partfull_quiz_json = os.path.join(base_dir, 'json_pathways/tax_data/diff_in_partfull_data.json')
-        budget_paycheck_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/budget_paycheck_data.json')
-        rent_bills_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/rent_bills_data.json')
-        save_money_quiz_json = os.path.join(base_dir, 'json_pathways/budget_data/save_money_data.json')
-        retiring_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/retiring_data.json')
-        state_workplace_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/state_workplace_data.json')
-        what_is_pension_quiz_json = os.path.join(base_dir, 'json_pathways/pension_data/what_is_pension_data.json')
+        calc_tax_quiz_json = os.path.join(
+            base_dir, 'json_pathways/tax_data/calc_tax_data.json')
+        payslip_reading_quiz_json = os.path.join(
+            base_dir, 'json_pathways/tax_data/payslip_reading_data.json')
+        diff_in_partfull_quiz_json = os.path.join(
+            base_dir, 'json_pathways/tax_data/diff_in_partfull_data.json')
+        budget_paycheck_quiz_json = os.path.join(
+            base_dir, 'json_pathways/budget_data/budget_paycheck_data.json')
+        rent_bills_quiz_json = os.path.join(
+            base_dir, 'json_pathways/budget_data/rent_bills_data.json')
+        save_money_quiz_json = os.path.join(
+            base_dir, 'json_pathways/budget_data/save_money_data.json')
+        retiring_quiz_json = os.path.join(
+            base_dir, 'json_pathways/pension_data/retiring_data.json')
+        state_workplace_quiz_json = os.path.join(
+            base_dir, 'json_pathways/pension_data/state_workplace_data.json')
+        what_is_pension_quiz_json = os.path.join(
+            base_dir, 'json_pathways/pension_data/what_is_pension_data.json')
 
         # Load Calculating Taxes Quiz data
         with open(calc_tax_quiz_json, 'r', encoding='utf8') as f:
@@ -77,14 +87,16 @@ class Command(BaseCommand):
 
         # Seed data for each quiz
         self.seed_quiz_data(calc_tax_quiz_data)
-        self.stdout.write(self.style.SUCCESS('Data for Calculating Taxes Quiz loaded successfully!'))
+        self.stdout.write(
+            self.style.SUCCESS('Data for Calculating Taxes Quiz loaded successfully!'))
 
         self.seed_quiz_data(payslip_reading_quiz_data)
         self.stdout.write(self.style.SUCCESS('Data for Payslip Reading Quiz loaded successfully!'))
 
         self.seed_quiz_data(diff_in_partfull_quiz_data)
         self.stdout.write(
-            self.style.SUCCESS('Data for Differences in Part-time and Full-time Pay Quiz loaded successfully!'))
+            self.style.SUCCESS(
+                'Data for Differences in Part-time and Full-time Pay Quiz loaded successfully!'))
 
         self.seed_quiz_data(budget_paycheck_quiz_data)
         self.stdout.write(self.style.SUCCESS('Data for Budget Paycheck Quiz loaded successfully!'))
@@ -102,7 +114,8 @@ class Command(BaseCommand):
         self.stdout.write(self.style.SUCCESS('Data for State Workplace Quiz loaded successfully!'))
 
         self.seed_quiz_data(what_is_pension_quiz_json)
-        self.stdout.write(self.style.SUCCESS('Data for What is a Pension Quiz loaded successfully!'))
+        self.stdout.write(self.style.SUCCESS(
+            'Data for What is a Pension Quiz loaded successfully!'))
 
         # Seed all the profile avatars and decorations
         avatar = Avatar(name = 'Cat',
@@ -217,4 +230,3 @@ class Command(BaseCommand):
                         quiz=quiz,
                         position=info_data['position']
                     )
-

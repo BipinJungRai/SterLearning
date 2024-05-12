@@ -43,8 +43,11 @@
         const data = JSON.parse(e.data);
         const message = data.message;
         const id = data.id;
+        const target = data.target
         // Call the setMessage function to add the new li element
-        setMessage(message, id);
+        if ({{user.id}} == target){
+            setMessage(message, id);
+        }
 
     };
 

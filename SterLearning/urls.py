@@ -40,4 +40,5 @@ urlpatterns = [
     path("shop/", user_views.shop, name="shop"),
     path("accounts/", include("app_user.urls")),
     path("tools/", tools_views.mortgage, name="mortgage-calculator"),
+    path("", include("app_pages.urls"))
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -16,15 +16,14 @@ def check_unique_pos(self):
     if mcq.count() != 0:
         if self.__class__ != MultipleChoice or mcq.count() != 1:
             raise ValidationError(gettext("SectionAlreadyAtPosition"))
-    
+
     if fib.count() != 0:
         if self.__class__ != FillInBlank or fib.count() != 1:
             raise ValidationError(gettext("SectionAlreadyAtPosition"))
-    
+
     if inf.count() != 0:
         if self.__class__ != Information or inf.count() != 1:
             raise ValidationError(gettext("SectionAlreadyAtPosition"))
-    
 
 # Quiz model - stores which pathway the quiz is in and its name.
 class Quiz(models.Model):
@@ -95,16 +94,16 @@ class FillInBlankSentence(models.Model):
         blank = True
         after = True
 
-        if self.before == None or self.before == "":
+        if self.before is None or self.before == "":
             before = False
-        
-        if self.blank == None or self.blank == "":
+
+        if self.blank is None or self.blank == "":
             blank = False
 
-        if self.after == None or self.after == "":
+        if self.after is None or self.after == "":
             after = False
 
-        if before == False and blank == False and after == False:
+        if before is False and blank is False and after is False:
             raise ValidationError("SentenceEmpty")
 
 

@@ -1,7 +1,5 @@
-from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
-from django.views.generic import CreateView
-from .models import ExtendedUser, Friend, FriendRequest, Notification, Avatar, Decoration
-from django.urls import reverse_lazy
+import random
+import string
 import os
 from django.shortcuts import render, redirect, get_object_or_404
 from google.oauth2 import id_token
@@ -10,16 +8,15 @@ from django.http import HttpResponse, HttpRequest
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.views import APIView
-import uuid
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
-from app_quiz.models import Attempt
-import random
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django.contrib import messages
-
+from app_quiz.models import Attempt
+from .models import ExtendedUser, Friend, FriendRequest, Notification, Avatar, Decoration
+from .forms import UserCreationWithEmailForm, GoogleUserChangeUsername, LoginForm
 
 # Create your views here.
 def index(request):
@@ -57,10 +54,13 @@ class AuthGoogle(APIView):
                 email=user_email
             )
         except ObjectDoesNotExist:
+            password = ''.join(random.choices(string.ascii_lowercase +
+                                              string.ascii_uppercase + string.digits, k=20))
             user = ExtendedUser.objects.create(
                 username=user_email,
                 email=user_email,
                 first_name=user_data["given_name"],
+                password = password
                 )
             login(request, user)
             return redirect('change-username')
@@ -78,7 +78,7 @@ class AuthGoogle(APIView):
         )
 
 @login_required
-def changeUsername(request):
+def change_username(request):
     if request.method == "POST":
         form = GoogleUserChangeUsername(request.POST, instance=request.user)
         if form.is_valid():
@@ -113,13 +113,13 @@ def user_settings(request):
 def user_tools(request):
     return render(request, 'tools.html')
 
-def add_friend(request, userID):
-    new_friend = ExtendedUser.objects.get(id=userID)
+def add_friend(request, user_id):
+    new_friend = ExtendedUser.objects.get(id=user_id)
     Friend.make_friend(request.user, new_friend)
     Friend.make_friend(new_friend, request.user)
 
-def remove_friend(request, userID):
-    new_friend = ExtendedUser.objects.get(id=userID)
+def remove_friend(request, user_id):
+    new_friend = ExtendedUser.objects.get(id=user_id)
     Friend.remove_friend(request.user, new_friend)
     Friend.remove_friend(new_friend, request.user)
     return redirect('friends')
@@ -138,33 +138,37 @@ def user_friends(request):
                 sent_friend_requests = FriendRequest.objects.all().filter(sent_from=request.user)
             if FriendRequest.objects.filter(sent_to=request.user):
                 recieved_friend_requests = FriendRequest.objects.all().filter(sent_to=request.user)
-        return render(request, 'friends.html', {'users':users, 'friends':friends, 'sent_requests':sent_friend_requests, 'received_requests':recieved_friend_requests})
+        return render(request, 'friends.html', {'users':users, 'friends':friends,
+                                                'sent_requests':sent_friend_requests, 
+                                                'received_requests':recieved_friend_requests})
     else:
         return redirect('login')
 
-def send_friend_request(request, userID):
-    new_friend = ExtendedUser.objects.get(id=userID)
+def send_friend_request(request, user_id):
+    new_friend = ExtendedUser.objects.get(id=user_id)
     friend_request = FriendRequest.objects.get_or_create(sent_from=request.user, sent_to=new_friend)
-    notification = Notification.objects.get_or_create(message="Friend request: " + request.user.username, user=ExtendedUser.objects.get(id=userID))
+    current_notification = Notification.objects.get_or_create(message="Friend request: " +
+                                                      request.user.username,
+                                                      user=ExtendedUser.objects.get(id=user_id))
     return redirect('friends')
 
-def remove_friend_request(request, userID):
-    new_friend = ExtendedUser.objects.get(id=userID)
+def remove_friend_request(request, user_id):
+    new_friend = ExtendedUser.objects.get(id=user_id)
     friend_request = FriendRequest.objects.get(sent_from=new_friend, sent_to=request.user)
     friend_request.delete()
-    
-def deny_friend_request(request, userID):
-    remove_friend_request(request, userID)
+
+def deny_friend_request(request, user_id):
+    remove_friend_request(request, user_id)
     return redirect('friends')
 
-def accept_friend_request(request, userID):
-    add_friend(request, userID)
-    remove_friend_request(request, userID)
+def accept_friend_request(request, user_id):
+    add_friend(request, user_id)
+    remove_friend_request(request, user_id)
     return redirect('friends')
 
-def notification(request, notificationID):
-    notification = Notification.objects.get(id=notificationID)
-    notification.delete()
+def notification(request, notification_id):
+    current_notification = Notification.objects.get(id=notification_id)
+    current_notification.delete()
     return redirect('friends')
 
 def friend_suggestion(request):
@@ -182,24 +186,27 @@ def friend_suggestion(request):
     other_users = list(dict.fromkeys(other_users)) #remove duplicates
     if len(other_users) > 0:
         friend = random.choice(other_users)
-        notification = Notification.objects.get_or_create(message="Friend Suggestion: " + friend.username + " has completed the " + quiz.name + " quiz too!", user=request.user)
+        current_notification = Notification.objects.get_or_create(message="Friend Suggestion: " +
+                                                          friend.username + " has completed the " +
+                                                          quiz.name + " quiz too!",
+                                                          user=request.user)
     return redirect('pathways-home')
 
 def notification_socket(request):
     if request.method == "GET":
-        notification = get_object_or_404(Notification, id = request.GET.get('notification'))
-        notification.delete()
+        current_notification = get_object_or_404(Notification, id = request.GET.get('notification'))
+        current_notification.delete()
         return redirect('friends')
-    
+
 def shop(request):
     if request.user.is_authenticated:
         if request.method == 'POST':
             user = request.user
-            requestType = request.POST.get('type')
-            requestId = request.POST.get('id')
+            request_type = request.POST.get('type')
+            request_id = request.POST.get('id')
 
-            if requestType == 'buy_avatar':
-                avatar = get_object_or_404(Avatar, id = requestId)
+            if request_type == 'buy_avatar':
+                avatar = get_object_or_404(Avatar, id = request_id)
 
                 if user.points() >= avatar.cost:
                     user.spentPoints += avatar.cost
@@ -213,25 +220,26 @@ def shop(request):
                     messages.add_message(request, messages.ERROR, 'You do not have enough' +
                                            ' points for this item! Complete more quizzes to ' +
                                            'earn more points.')
-            elif requestType == 'buy_decoration':
-                decoration = get_object_or_404(Decoration, id = requestId)
-                
+            elif request_type == 'buy_decoration':
+                decoration = get_object_or_404(Decoration, id = request_id)
+
                 if user.points() >= decoration.cost:
                     user.spentPoints += decoration.cost
                     user.inventoryDecoration.add(decoration)
                     user.save()
 
                     messages.add_message(request, messages.SUCCESS, 'You have successfully ' +
-                                          'purchased ' + decoration.name + ' for ' + str(decoration.cost) + 
+                                          'purchased ' + decoration.name +
+                                          ' for ' + str(decoration.cost) +
                                           ' points!')
                 else:
                     messages.add_message(request, messages.ERROR, 'You do not have enough' +
                                            ' points for this item! Complete more quizzes to ' +
                                            'earn more points.')
-            elif requestType == 'equip_avatar':
-                avatar = get_object_or_404(Avatar, id = requestId)
+            elif request_type == 'equip_avatar':
+                avatar = get_object_or_404(Avatar, id = request_id)
 
-                if user.inventoryAvatar.all().filter(id = requestId).count() == 1:
+                if user.inventoryAvatar.all().filter(id = request_id).count() == 1:
                     user.avatar = avatar
                     user.save()
 
@@ -239,10 +247,10 @@ def shop(request):
                                           'equipped ' + avatar.name)
                 else:
                     messages.add_message(request, messages.ERROR, 'You are unable to equip this.')
-            elif requestType == 'equip_decoration':
-                decoration = get_object_or_404(Decoration, id = requestId)
+            elif request_type == 'equip_decoration':
+                decoration = get_object_or_404(Decoration, id = request_id)
 
-                if user.inventoryDecoration.all().filter(id = requestId).count() == 1:
+                if user.inventoryDecoration.all().filter(id = request_id).count() == 1:
                     user.decoration = decoration
                     user.save()
 
@@ -264,4 +272,3 @@ def shop(request):
     else:
         messages.add_message(request, messages.ERROR, 'You need to be logged in')
         return redirect('login')
-

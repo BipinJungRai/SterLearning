@@ -1,3 +1,4 @@
+{% extends "base.html" %}
 {% load i18n %}
 {% load static %}
 <head>
@@ -5,15 +6,21 @@
 </head>
 
 <body id="body">
-    <p id="progress">
-        connecting...
-    </p>
-    <h1 id="title"></h1>
-    <form id="quizform">
-    </form>
-    <div id="marks"><div></div></div>
+    {% block content %}
+    <div class="wrapper-pathways">
+        <p id="progress">
+            connecting...
+        </p>
+        <h1 id="quiz-title"></h1>
+        <div id="quiz-background">
+            <form id="quizform">
+            </form>
+            <div id="marks"><div></div></div>
+        </div>
+    </div>
+    {% endblock %}
 </body>
-
+{% block script %}
 <script>
     let url = `ws://${window.location.host}/ws/quiz-stream`
         const quizSocket = new WebSocket(url)
@@ -48,7 +55,7 @@
                 button.setAttribute('id', 'nextbutton');
                 button.setAttribute('value', 'Start Quiz');
 
-                const title = document.getElementById("title"); //get the title
+                const title = document.getElementById("quiz-title"); //get the title
                 const titletext = document.createTextNode("{{quiz.name}}"); //make words for title
                 document.getElementById("quizform").appendChild(button); //add button to page
                 title.appendChild(titletext); //put words in title
@@ -130,7 +137,7 @@
                 b.setAttribute("value", "Continue");
 
                 //set title of question part
-                document.getElementById("title").replaceChildren(document.createTextNode(data.section.title));
+                document.getElementById("quiz-title").replaceChildren(document.createTextNode(data.section.title));
 
 
                 // var fm = document.querySelector('form');
@@ -185,7 +192,7 @@
                                 quizSocket.send(JSON.stringify({
                                     'type': 'answer',
                                     'section_type': 'mcq',
-                                    'question_id': {{quiz.id}},
+                                    'question_id': data.section.sid,
                                     'selected_id': answer.options
                                 }))
                             // }
@@ -246,22 +253,23 @@
 
             if (data.type == "end_quiz") {
                 //clear everything from screen, including form
-                document.getElementById("title").replaceChildren(document.createTextNode("end of quiz"))
+                document.getElementById("quiz-title").replaceChildren(document.createTextNode("end of quiz"))
                 document.getElementById("quizform").remove()
 
                 //you have reached the end of the quiz! you have earned x points overall
                 let body = document.getElementById("body")
-                body.appendChild(document.createTextNode("congrats u have reached the end of the quiz\n"))
-                body.appendChild(document.createTextNode("you scored: " + points + " points \n"))
+                document.getElementById("marks").appendChild(document.createTextNode("congrats u have reached the end of the quiz\n"))
+                document.getElementById("marks").appendChild(document.createTextNode("you scored: " + points + " points \n"))
                 //and your accuracy was x%
                 let acc = (correct / answered) * 100
-                body.appendChild(document.createTextNode("with accuracy: " + Math.floor(acc) + "%\n"))
+                document.getElementById("marks").appendChild(document.createTextNode("with accuracy: " + Math.floor(acc) + "%\n"))
 
                 //return home?
                 let home = document.createElement("a")
                 home.setAttribute("href", "{% url 'friend-suggestion' %}")
                 home.appendChild(document.createTextNode("return home"))
-                body.appendChild(home)
+                document.getElementById("marks").appendChild(home)
             }
         }
 </script>
+{% endblock %}
