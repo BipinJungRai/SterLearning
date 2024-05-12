@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 {% load i18n %}
 {% load static %}
-<head>
-    <meta charset="utf-8">
-</head>
+
 
 <body id="body">
     {% block content %}
+    <head>
+        <title>Quiz - {{ quiz.name }}</title>
+        <meta charset="utf-8">
+    </head>
+    
     <div class="wrapper-pathways">
         <p id="progress">
             connecting...
