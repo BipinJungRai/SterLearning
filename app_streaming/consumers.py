@@ -4,38 +4,39 @@ from django.shortcuts import get_object_or_404
 from app_quiz.models import *
 from asgiref.sync import async_to_sync
 
+
 # Retrieves question at specified position in a given quiz.
 def get_section(quiz, pos):
     result = {}
-    
-    mcq = MultipleChoice.objects.filter(quiz = quiz)
-    fib = FillInBlank.objects.filter(quiz = quiz)
-    inf = Information.objects.filter(quiz = quiz)
+
+    mcq = MultipleChoice.objects.filter(quiz=quiz)
+    fib = FillInBlank.objects.filter(quiz=quiz)
+    inf = Information.objects.filter(quiz=quiz)
 
     section = {}
 
-    if mcq.filter(position = pos).count() == 1:
-        q = mcq.get(position = pos)
+    if mcq.filter(position=pos).count() == 1:
+        q = mcq.get(position=pos)
         section["sid"] = q.id
         section["title"] = q.title
         section["position"] = pos
 
         options = []
-        for option in MultipleChoiceOptions.objects.filter(question = q):
+        for option in MultipleChoiceOptions.objects.filter(question=q):
             options.append({"id": option.id,
                             "text": option.text})
-            
+
         section["options"] = options
         result["section_type"] = "mcq"
 
-    elif fib.filter(position = pos).count() == 1:
-        q = fib.get(position = pos)
+    elif fib.filter(position=pos).count() == 1:
+        q = fib.get(position=pos)
         section["sid"] = q.id
         section["title"] = q.title
         section["position"] = pos
 
         sentences = []
-        for sentence in FillInBlankSentence.objects.filter(question = q):
+        for sentence in FillInBlankSentence.objects.filter(question=q):
             blank = False
 
             if sentence.blank:
@@ -44,15 +45,15 @@ def get_section(quiz, pos):
             # There can be any number of sentences, not all will have a blank.
             # The blank word can also be at any point in the sentence.
             sentences.append({"id": sentence.id,
-                             "before": sentence.before,
-                             "blank": blank,
-                             "after": sentence.after})
+                              "before": sentence.before,
+                              "blank": blank,
+                              "after": sentence.after})
 
         section["sentences"] = sentences
         result["section_type"] = "fib"
 
-    elif inf.filter(position = pos).count() == 1:
-        i = inf.get(position = pos)
+    elif inf.filter(position=pos).count() == 1:
+        i = inf.get(position=pos)
         section["sid"] = i.id
         section["title"] = i.title
         section["position"] = pos
@@ -61,7 +62,7 @@ def get_section(quiz, pos):
 
         if i.image:
             section["image"] = i.image.url
-        
+
         result["section_type"] = "inf"
 
     else:
@@ -78,7 +79,7 @@ class QuizConsumer(WebsocketConsumer):
         self.accept()
         self.user = self.scope["user"]  # for later use
 
-        self.send(text_data = json.dumps(
+        self.send(text_data=json.dumps(
             {
                 "type": "connected"
             }
@@ -98,8 +99,8 @@ class QuizConsumer(WebsocketConsumer):
                 qid = data["question_id"]
                 sid = data["selected_id"]
 
-                question = get_object_or_404(MultipleChoice, id = qid)
-                selected = get_object_or_404(MultipleChoiceOptions, id = sid)
+                question = get_object_or_404(MultipleChoice, id=qid)
+                selected = get_object_or_404(MultipleChoiceOptions, id=sid)
                 points = 0
 
                 if selected.correct:
@@ -119,42 +120,42 @@ class QuizConsumer(WebsocketConsumer):
                             "awarded": 0
                         }
                     ))
-                
-                awarded = PointsAwarded(user = self.user,
-                                        points = points)
+
+                awarded = PointsAwarded(user=self.user,
+                                        points=points)
                 awarded.save()
-                
-                response = MultipleChoiceResponse(attempt = self.attempt,
-                                                  answer = selected,
-                                                  points_awarded = awarded)
+
+                response = MultipleChoiceResponse(attempt=self.attempt,
+                                                  answer=selected,
+                                                  points_awarded=awarded)
                 response.save()
             elif data["section_type"] == "fib":
                 total = 0
                 correct = []
-                response = FillInBlankReponse(attempt = self.attempt)
+                response = FillInBlankReponse(attempt=self.attempt)
                 response.save()
 
                 for sentence in data["sentences"]:
                     sid = sentence["id"]
                     blank = sentence["blank"]
                     points = 0
-                    
-                    s = get_object_or_404(FillInBlankSentence, id = sid)
+
+                    s = get_object_or_404(FillInBlankSentence, id=sid)
                     if blank.lower() == s.blank.lower():
                         total += s.points
                         points = s.points
                         correct.append(sid)
 
-                    awarded = PointsAwarded(user = self.user,
-                                        points = points)
+                    awarded = PointsAwarded(user=self.user,
+                                            points=points)
                     awarded.save()
 
-                    answer = FillInBlankAnswer(response = response,
-                                               blank = blank,
-                                               points_awarded = awarded,
-                                               sentence = s)
+                    answer = FillInBlankAnswer(response=response,
+                                               blank=blank,
+                                               points_awarded=awarded,
+                                               sentence=s)
                     answer.save()
-                
+
                 self.send(json.dumps(
                     {
                         "type": "validated_fib_answer",
@@ -166,7 +167,7 @@ class QuizConsumer(WebsocketConsumer):
         # Client ready for next question.
         elif data["type"] == "next":
             qid = data["qid"]
-            quiz = get_object_or_404(Quiz, id = qid)
+            quiz = get_object_or_404(Quiz, id=qid)
             position = data["position"]
             result = get_section(quiz, position + 1)
 
@@ -196,14 +197,14 @@ class QuizConsumer(WebsocketConsumer):
         # Client ready for first question.    
         elif data["type"] == "start":
             qid = data["qid"]
-            quiz = get_object_or_404(Quiz, id = qid)
+            quiz = get_object_or_404(Quiz, id=qid)
             result = get_section(quiz, 1)
 
             print(self.user)
-            attempt = Attempt(user = self.user,
-                              quiz = quiz,
-                              completed = False,
-                              quiz_open = True)
+            attempt = Attempt(user=self.user,
+                              quiz=quiz,
+                              completed=False,
+                              quiz_open=True)
             attempt.save()
 
             self.attempt = attempt
@@ -215,6 +216,7 @@ class QuizConsumer(WebsocketConsumer):
                     "section": result["section"]
                 }
             ))
+
 
 class NotificationConsumer(AsyncWebsocketConsumer):
     async def connect(self):
