@@ -1,4 +1,4 @@
-from app_tools.views import mortgageForm
+from app_tools.views import MortgageForm
 from django.test import TestCase, RequestFactory
 from django.contrib.auth import get_user_model
 from app_tools.views import mortgage
@@ -8,7 +8,7 @@ class MortgageFormTest(TestCase):
 
     # Test if the form is valid with correct data
     def test_form_valid_data(self):
-        form = mortgageForm(data={
+        form = MortgageForm(data={
             'loan_amount': 100000.0,
             'home_value': 150000.0,
             'downpayment': 50000.0,
@@ -22,7 +22,7 @@ class MortgageFormTest(TestCase):
 
     # Test if the form is invalid with missing data
     def test_form_invalid_data(self):
-        form = mortgageForm(data={
+        form = MortgageForm(data={
             'loan_amount': 100000.0,
             'home_value': 150000.0,
             'downpayment': 50000.0,
